@@ -1,3 +1,11 @@
+# OCR A-Level Computer Science NEA
+This is my Non-Exam-Assessment for OCR A-Level Computer Science
+## Overview 
+This project will be a prototype platform that will connect patients, doctors, and pharmaceutical companies in one platform.
+It is coded in React + TypeScript + Vite for the client side and Python (Flask) for the back-end.
+
+
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
