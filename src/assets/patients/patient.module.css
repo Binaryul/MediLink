@@ -1,3 +1,23 @@
-.stop{
-    text-align: center;
-}
+.patientCard {
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 300px;
+    margin: 20px auto;
+  }
+  
+  .patientCard h2 {
+    font-size: 1.5em;
+    color: #333;
+  }
+  
+  .patientCard p {
+    font-size: 1.1em;
+    color: #555;
+  }
+  
+  .patientCard strong {
+    color: #333;
+  }
+  
