@@ -2,32 +2,50 @@ import PropTypes from 'prop-types';
 import styles from './patient.module.css';
 
 
-function Patient({ patientData }: { patientData: PatientInfo }) {
+/*type PatientInfo ={
+  name: string;
+  age: number;
+  diagnosis: string;
+  contact: string;
+};*/
+
+const defaultPatientData: PatientInfo = {
+  name: "Not Real",
+  age: 0,
+  diagnosis: "death",
+  contact: "fax machine",
+};
+
+function Patient({ patientData }: { patientData: Partial<PatientInfo>; }) {
+  const sanitizedData: PatientInfo = {
+    name: typeof patientData.name === "string" ? patientData.name : defaultPatientData.name,
+    age: typeof patientData.age === "number" ? patientData.age : defaultPatientData.age,
+    diagnosis: typeof patientData.diagnosis === "string" ? patientData.diagnosis : defaultPatientData.diagnosis,
+    contact: typeof patientData.contact === "string" ? patientData.contact : defaultPatientData.contact,
+  };
+
+
   return (
     <div className={styles.patientCard}>
-      <h2>Patient Information</h2>
-      <p><strong>Name:</strong> {patientData.name}</p>
-      <p><strong>Age:</strong> {patientData.age}</p>
-      <p><strong>Diagnosis:</strong> {patientData.diagnosis}</p>
-      <p><strong>Contact:</strong> {patientData.contact}</p>
+      <h2><strong>Name:</strong> {sanitizedData.name}</h2>
+      <p><strong>Age:</strong> {sanitizedData.age}</p>
+      <p><strong>Diagnosis:</strong> {sanitizedData.diagnosis}</p>
+      <p><strong>Contact:</strong> {sanitizedData.contact}</p>
     </div>
   );
 }
 
 Patient.propTypes = {
   patientData: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    age: PropTypes.number.isRequired,
-    diagnosis: PropTypes.string.isRequired,
-    contact: PropTypes.string.isRequired
-  }).isRequired
+    name: PropTypes.string,
+    age: PropTypes.number,
+    diagnosis: PropTypes.string,
+    contact: PropTypes.string,
+  }),
 };
 
 Patient.defaultProps = {
-  name: "Not Real",
-  age: "Infinite",
-  diagnosis: "death",
-  contact: "fax machine"
+  patientData: defaultPatientData,
 };
 
 export default Patient;
