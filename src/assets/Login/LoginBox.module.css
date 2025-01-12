@@ -1,58 +1,70 @@
-.selected-role {
-    text-align: center;
-  }
-  
-  .selected-role button {
-    margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  .selected-role button:hover {
-    background: #0056b3;
-  }
-
-  .loginBox {
-    width: 400px;
-    margin: 50px auto;
-    background: #ffffff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
+/* Wrapper for centering the login box */
+.centerWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  background-color: #f5f5f5; /* Optional: Add a background color */
+  margin: 0; /* Remove any default margins */
+  box-sizing: border-box;
 }
 
+/* Login Box Container */
+.loginBox {
+  width: 400px;
+  background: #ffffff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+
+/* Tab Container Styles */
 .tabContainer {
-    display: flex;
-    justify-content: space-around;
-    background-color: #f7f7f7;
-    border-bottom: 2px solid #eaeaea;
+  display: flex;
+  justify-content: space-around;
+  background-color: #f7f7f7;
+  border-bottom: 2px solid #eaeaea;
 }
 
 .tabButton {
-    flex: 1;
-    padding: 10px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    color: #666;
-    transition: color 0.3s ease, border-bottom 0.3s ease;
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #666;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
 }
 
 .tabButton:hover {
-    color: #000;
+  color: #000;
 }
 
 .tabButton.active {
-    color: #000;
-    border-bottom: 3px solid #007bff;
+  color: #000;
+  border-bottom: 3px solid #007bff;
 }
 
-.formContainer {
-    padding: 20px;
+/* Sliding Animation Container */
+.sliderContainer {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: auto;
+}
+
+.slider {
+  display: flex;
+  width: 300%;
+  transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
 }

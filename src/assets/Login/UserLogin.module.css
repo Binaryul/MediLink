@@ -5,7 +5,9 @@
 }
 
 .input {
+    width: 90%;
     padding: 10px;
+    margin-bottom: 5px;
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -21,6 +23,11 @@
     font-size: 12px;
     margin-top: -10px;
 }
+
+/*.passwordContainer {
+    position: relative;
+    width: 100%;
+}*/
 
 .submitButton {
     padding: 10px;
