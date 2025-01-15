@@ -1,4 +1,3 @@
-/* Wrapper for centering the login box */
 .centerWrapper {
   display: flex;
   justify-content: center;
@@ -18,7 +17,6 @@
   border-radius: 10px;
   overflow: hidden;
 }
-
 
 /* Tab Container Styles */
 .tabContainer {
@@ -45,7 +43,7 @@
 
 .tabButton.active {
   color: #000;
-  border-bottom: 3px solid #007bff;
+  border-bottom: 3px solid var(--accent);
 }
 
 /* Sliding Animation Container */
@@ -59,7 +57,7 @@
 .slider {
   display: flex;
   width: 300%;
-  transition: transform 0.5s ease-in-out;
+  transition: transform 500ms cubic-bezier(0.4, 0, 1, 1);
 }
 
 .slide {

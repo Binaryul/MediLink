@@ -1,46 +1,77 @@
-.loginForm {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+:root {
+  --accent: #8a2be2;
+  --accent_dark: #621ba4;
 }
 
-.input {
-    width: 90%;
-    padding: 10px;
-    margin-bottom: 5px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.loginForm {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.input,
+.submitButton {
+  width: 100%; /* Ensure all elements span the full width of the container */
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box; /* Include padding in width calculation */
+}
+.input,
+.passwordContainer {
+  margin-bottom: 15px; /* Add spacing between fields */
 }
 
 .input.invalid {
-    border-color: red;
-    background-color: #ffe6e6;
+  border-color: red;
+  background-color: #ffe6e6;
 }
 
 .errorText {
-    color: red;
-    font-size: 12px;
-    margin-top: -10px;
+  color: red;
+  font-size: 12px;
+  margin-top: -10px;
 }
 
-/*.passwordContainer {
-    position: relative;
-    width: 100%;
-}*/
-
 .submitButton {
-    padding: 10px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  font-size: 16px;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: var(--accent_dark);
 }
 
 .submitButton:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.passwordContainer {
+  position: relative;
+  width: 100%; /* Match input field width */
+  display: flex;
+  align-items: center;
+}
+
+.passwordInput {
+  width: 100%; /* Match input field width */
+  padding-right: 40px;
+  box-sizing: border-box;
+}
+
+.togglePasswordButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-90%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #888;
 }

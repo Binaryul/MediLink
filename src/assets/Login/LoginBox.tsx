@@ -50,13 +50,13 @@ function LoginBox() {
             }}
           >
             <div className={styles.slide}>
-              <PatientLogin />
+              <PatientLogin activeTab={activeTab}/>
             </div>
             <div className={styles.slide}>
-              <DrLogin />
+              <DrLogin activeTab={activeTab}/>
             </div>
             <div className={styles.slide}>
-              <PharLogin />
+              <PharLogin activeTab={activeTab}/>
             </div>
           </div>
         </div>
