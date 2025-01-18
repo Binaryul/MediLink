@@ -1,24 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_bcrypt import Bcrypt
-from flask_cors import CORS 
-
+from flask_cors import CORS
+from users.doctor_users import doctor_users
+from users.pharma_users import pharma_users
+from users.patient_users import patient_users
 
 app = Flask(__name__) # Create the Flask app
 bcrypt = Bcrypt(app) # Create a Bcrypt object
 CORS(app) # This will enable CORS for all routes
 
-# Separate in-memory stores for different user types
-doctor_users = {
-    "doctor@example.com": bcrypt.generate_password_hash("password123").decode('utf-8'),
-}
-
-pharma_users = {
-    "pharma@example.com": bcrypt.generate_password_hash("password123").decode('utf-8'),
-}
-
-patient_users = {
-    "patient@example.com": bcrypt.generate_password_hash("password123").decode('utf-8'),
-}
+def verify_user(users, email, password):
+    for hashed_email, hashed_password in users.items():
+        if bcrypt.check_password_hash(hashed_email, email) and bcrypt.check_password_hash(hashed_password, password):
+            return True
+    return False
 
 @app.route('/login/doctor', methods=['POST'])
 def login_doctor():
@@ -28,15 +23,11 @@ def login_doctor():
     print(f"Received doctor login request: email={email}, password={password}")
     if not email or not password:
         return jsonify({"status": "fail", "message": "Email and password are required"}), 400
-    if email in doctor_users:
-        if bcrypt.check_password_hash(doctor_users[email], password):
-            return jsonify({"status": "success", "message": "Login successful"}), 200 
-        else: 
-            print("Incorrect password")
-            return jsonify({"status": "fail", "message": "Incorrect password"}), 401
+    if verify_user(doctor_users, email, password):
+        return jsonify({"status": "success", "message": "Login successful"}), 200 
     else:
-        print("Email not found")
-        return jsonify({"status": "fail", "message": "Email not found"}), 404
+        print("Invalid email or password")
+        return jsonify({"status": "fail", "message": "Invalid email or password"}), 401
 
 @app.route('/login/pharma', methods=['POST'])
 def login_pharma():
@@ -46,15 +37,11 @@ def login_pharma():
     print(f"Received pharma login request: email={email}, password={password}")
     if not email or not password:
         return jsonify({"status": "fail", "message": "Email and password are required"}), 400
-    if email in pharma_users:
-        if bcrypt.check_password_hash(pharma_users[email], password):
-            return jsonify({"status": "success", "message": "Login successful"}), 200 
-        else: 
-            print("Incorrect password")
-            return jsonify({"status": "fail", "message": "Incorrect password"}), 401
+    if verify_user(pharma_users, email, password):
+        return jsonify({"status": "success", "message": "Login successful"}), 200 
     else:
-        print("Email not found")
-        return jsonify({"status": "fail", "message": "Email not found"}), 404
+        print("Invalid email or password")
+        return jsonify({"status": "fail", "message": "Invalid email or password"}), 401
 
 @app.route('/login/patient', methods=['POST'])
 def login_patient():
@@ -64,15 +51,11 @@ def login_patient():
     print(f"Received patient login request: email={email}, password={password}")
     if not email or not password:
         return jsonify({"status": "fail", "message": "Email and password are required"}), 400
-    if email in patient_users:
-        if bcrypt.check_password_hash(patient_users[email], password):
-            return jsonify({"status": "success", "message": "Login successful"}), 200 
-        else: 
-            print("Incorrect password")
-            return jsonify({"status": "fail", "message": "Incorrect password"}), 401
+    if verify_user(patient_users, email, password):
+        return jsonify({"status": "success", "message": "Login successful"}), 200 
     else:
-        print("Email not found")
-        return jsonify({"status": "fail", "message": "Email not found"}), 404
+        print("Invalid email or password")
+        return jsonify({"status": "fail", "message": "Invalid email or password"}), 401
 
 if __name__ == '__main__': # This is to ensure that the app is run directly
     print("Starting server on port 5000") # Log server start

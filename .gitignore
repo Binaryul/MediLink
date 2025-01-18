@@ -26,4 +26,4 @@ dist-ssr
 
 #python stuff
 server/venv/
-server/__pycache__/
+server/src/users/__pycache__/

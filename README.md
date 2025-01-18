@@ -1,58 +1,48 @@
 # OCR A-Level Computer Science NEA
-This is my Non-Exam-Assessment for OCR A-Level Computer Science
+
+This is my Non-Exam-Assessment for OCR A-Level Computer Science.
+
 ## Overview 
-This project will be a prototype platform that will connect patients, doctors, and pharmaceutical companies in one platform.
-It is coded in React + TypeScript + Vite for the client side and Python (Flask) for the back-end.
+
+This project is a prototype platform that connects patients, doctors, and pharmaceutical companies in one platform. It is coded in React + TypeScript + Vite for the client side and Python (Flask) for the back-end.
+
+## Installation
+
+To get started with the project, follow these steps:
+
+1. Clone the repository:
+    ```sh
+    git clone https://github.com/Binaryul/MediLink.git
+    ```
+2. Navigate to the project directory:
+    ```sh
+    cd MediLink
+    ```
+3. Install the dependencies for the client:
+    ```sh
+    cd client
+    npm install
+    ```
+4. Install the dependencies for the server:
+    ```sh
+    cd ../server
+    pip install -r requirements.txt
+    ```
+
+## Usage
+
+To run the project locally, follow these steps:
+
+1. Start the client:
+    ```sh
+    cd client
+    npm run dev
+    ```
+2. Start the server:
+    ```sh
+    cd ../server
+    python main.py
+    ```
 
 
 
-# React + TypeScript + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
-```
-
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
