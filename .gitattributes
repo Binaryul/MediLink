@@ -1,0 +1,28 @@
+# Normalize line endings to LF in repo
+* text=auto eol=lf
+
+# Treat specific file types as text
+*.ts  text eol=lf
+*.tsx text eol=lf
+*.js  text eol=lf
+*.jsx text eol=lf
+*.py  text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.md  text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Prevent Windows executables and images from being changed
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.exe binary
+*.dll binary
+*.db binary
+
+# Keep shell scripts Unix-style
+*.sh text eol=lf
