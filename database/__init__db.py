@@ -3,7 +3,7 @@ import sqlite3
 conn = sqlite3.connect("database/MediLink.db")
 c = conn.cursor()
 c.execute("PRAGMA foreign_keys = ON;")
-print(conn.total_changes)
+# print(conn.total_changes)
 
 #---------------------- Start of Independant tables
 
@@ -17,7 +17,7 @@ c.execute("""
 """)
 
 c.execute("""
-	CREATE TABLE IF NOT EXISTS Patient(
+	CREATE TABLE IF NOT EXISTS Patients(
 		patientID TEXT NOT NULL PRIMARY KEY,
 		Name TEXT NOT NULL,
 		Email TEXT UNIQUE NOT NULL,
@@ -43,28 +43,13 @@ c.execute("""
     CREATE TABLE IF NOT EXISTS DPEnrole(
           doctorID TEXT NOT NULL,
           patientID TEXT NOT NULL,
-          PRIMARY KEY (doctorID, patientID)
-          FOREIGN KEY (doctorID)
-          	REFERENCES Doctors (doctorID)
-          FOREIGN KEY (patientID)
-			REFERENCES Patient (patientID) 
-	);
-""")
-
-
-# Messaging Table
-
-c.execute("""
-	CREATE TABLE IF NOT EXISTS Messaging(
-          patientID TEXT NOT NULL,
-          doctorID TEXT NOT NULL,
           msgHistory TEXT,
           PRIMARY KEY (doctorID, patientID)
           FOREIGN KEY (doctorID)
           	REFERENCES Doctors (doctorID)
           FOREIGN KEY (patientID)
-			REFERENCES Patient (patientID) 
-    );
+			REFERENCES Patients (patientID) 
+	);
 """)
 
 
