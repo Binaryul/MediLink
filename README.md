@@ -3,6 +3,15 @@ A prototype healthcare platform that connects patients, doctors and pharmacies t
 
 
 
+## Development
+
+When working with the backend, run:
+```python
+source venv/bin/activate
+```
+to start the virtual machine.
+
+This will allow all libraries to work and install other libraries that are needed in the project.
 
 
 
