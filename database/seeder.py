@@ -1,5 +1,6 @@
 import sqlite3
 import json
+from werkzeug.security import generate_password_hash
 
 conn = sqlite3.connect("database/MediLink.db")
 c = conn.cursor()
@@ -38,15 +39,15 @@ patientHist3 = {
 }
 
 patient_data = [
-    ("BM00001", "Baku \"Usogui\" Madarame", "patient1@example.com", json.dumps(patientHist1), "1970-01-01"),
-    ("SK00001", "Souichi Kiruma", "patient2@example.com", json.dumps(patientHist2), "1970-02-02"),
-    ("TK00001", "Takaomi Kaji", "patient3@example.com", json.dumps(patientHist3), "1970-03-03")
+    ("BM00001", "Baku \"Usogui\" Madarame", "patient1@example.com", generate_password_hash("password123"), json.dumps(patientHist1), "1970-01-01"),
+    ("SK00001", "Souichi Kiruma", "patient2@example.com", generate_password_hash("password456"), json.dumps(patientHist2), "1970-02-02"),
+    ("TK00001", "Takaomi Kaji", "patient3@example.com", generate_password_hash("password789"), json.dumps(patientHist3), "1970-03-03")
 ]
 
 
 c.executemany("""
-    INSERT OR IGNORE INTO Patients (patientID, Name, Email, PatientHistory, DOB)
-    VALUES (?, ?, ?, ?, ?);
+    INSERT OR IGNORE INTO Patients (patientID, Name, Email, PasswordHash, PatientHistory, DOB)
+    VALUES (?, ?, ?, ?, ?, ?);
 """, 
     patient_data
 )
@@ -55,13 +56,13 @@ c.executemany("""
 #--------------------- Inserting sample data into the Doctors table
 
 doctor_data = [
-    ("TC00001", "Dr. Shoko Ieiri", "doctor1@example.com", "Reversed Cursed Technique"),
-    ("GH00002", "Dr. Gregory House", "doctor2@example.com", None)
+    ("TC00001", "Dr. Shoko Ieiri", "doctor1@example.com", generate_password_hash("qwerty"), "Reversed Cursed Technique"),
+    ("GH00002", "Dr. Gregory House", "doctor2@example.com", generate_password_hash("password"), None)
 ]
 
 c.executemany("""
-    INSERT OR IGNORE INTO Doctors (doctorID, Name, Email, Specialisation)
-    VALUES (?, ?, ?, ?);
+    INSERT OR IGNORE INTO Doctors (doctorID, Name, Email, PasswordHash, Specialisation)
+    VALUES (?, ?, ?, ?, ?);
 """, 
     doctor_data
 )
@@ -69,13 +70,13 @@ c.executemany("""
 #--------------------- Inserting sample data into the Pharmacies table
 
 pharmacy_data = [
-    ("MC00001", "MediCare Pharmacy"),
-    ("PH00002", "HealthPlus Pharmacy")
+    ("MC00001", "pharmacy1@example.com", generate_password_hash("asdfghjkl;"), "MediCare Pharmacy"),
+    ("PH00002", "pharmacy2@example.com", generate_password_hash("pingpong"), "HealthPlus Pharmacy")
 ]
 
 c.executemany("""
-    INSERT OR IGNORE INTO Pharmacies (pharmID, Name)
-    VALUES (?, ?);
+    INSERT OR IGNORE INTO Pharmacies (pharmID, Email, PasswordHash, Name)
+    VALUES (?, ?, ?, ?);
 """, 
     pharmacy_data
 )
