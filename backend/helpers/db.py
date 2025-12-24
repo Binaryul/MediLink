@@ -21,3 +21,25 @@ def close_db(e=None):
     db = g.pop("db", None)
     if db is not None:
         db.close()
+
+
+def user_info(email, role):
+    db = get_db()
+
+    table_map = {
+        "patient": "Patients",
+        "doctor": "Doctors",
+        "pharmacist": "Pharmacies"
+    }
+
+    table = table_map.get(role) # No need to check for invalid role here since it's handled upstream
+
+    user = db.execute(
+        f"SELECT * FROM {table} WHERE email = ?", (email,)
+    ).fetchone()
+
+    safe_user = {k:v for k, v in user.items() if k != "PasswordHash"}
+
+    # No need to recheck for password here since this function is called only after successful login
+
+    return dict(safe_user) if safe_user else None

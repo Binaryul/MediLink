@@ -1,12 +1,39 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from flask_cors import CORS
+from datetime import timedelta
+from functools import wraps
+# --- Helper Imports ---
 from helpers.db import get_db, close_db
-from helpers.auth import login_user
+from helpers.auth import login_user, user_info
+
+# --- Flask App Setup ---
 
 app = Flask(__name__)
 CORS(app)
 
-app.teardown_appcontext(close_db)
+app.teardown_appcontext(close_db) # Close DB connection after each request
+app.secret_key = "ThisIsASecretKey" # In production, use a secure key from environment variables
+
+# --- Route Protection Decorator ---
+
+def require_login(roles=None): # Gives me the option to use role or not
+    def decorator(f): 
+        @wraps(f) # used to keep Flask happy just a techincal requirment
+        def wrapper(*args, **kwargs):
+            if "Email" not in session:
+                return jsonify({"error": "Not logged in"}), 401
+            if roles is not None:
+                if session["Role"] not in roles:
+                    return jsonify({"error": "Unauthorized"}), 403
+            return f(*args, **kwargs) # Call the actual route function
+        return wrapper
+    return decorator
+
+
+# --- Route Configurations ---
+
+
+# - Test Routes -
 
 @app.route('/api/ping', methods=['GET'])
 def ping():
@@ -29,6 +56,7 @@ def db_test():
             'message': str(e)
         })
 
+# --- Authentication Routes ---
 
 @app.route('/api/login/<role>', methods=['POST'])
 def login(role):
@@ -45,11 +73,38 @@ def login(role):
     # Remove sensitive information before sending response
     safe_user = {k:v for k, v in user.items() if k != "PasswordHash"}
 
+    session.permanent = True
+    session["Email"] = safe_user["Email"]
+    session["Role"] = role
+
     return jsonify({
         "status": "success",
         "user": safe_user,
         "role": role
     })
 
+
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    session.clear()
+    return jsonify({"status": "logged out"})
+
+
+# --- User Info Route ---
+
+
+@app.route('/api/me', methods=['GET'])
+@require_login()
+def me():
+    safe_user = user_info(session["Email"], session["Role"])
+    if safe_user is None:
+        return jsonify({"error": "User not found"}), 404
+    return jsonify({
+        "status": "success",
+        "user": safe_user,
+        "role": session["Role"]
+    })
+
+
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5173, debug=True)
+    app.run(host='0.0.0.0', port=5173, debug=True) # sending the app through the same port the frontend is served on
