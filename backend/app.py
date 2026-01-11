@@ -3,8 +3,8 @@ from flask_cors import CORS
 from datetime import timedelta
 from functools import wraps
 # --- Helper Imports ---
-from helpers.db import get_db, close_db
-from helpers.auth import login_user, user_info
+from helpers.db import get_db, close_db, user_info, update_by_email
+from helpers.auth import login_user
 
 # --- Flask App Setup ---
 
@@ -104,6 +104,48 @@ def me():
         "user": safe_user,
         "role": session["Role"]
     })
+
+
+# --- User Profile Routes ---
+@app.route('/api/profile/<TargetRole>/<email>', methods=['GET'])
+@require_login() # Only doctors can access patient profiles since patients should only access their own profile via /api/me
+def get_profile(TargetRole, email):
+    requestor_role = session["Role"]
+    if TargetRole == "patient" and requestor_role != "doctor":
+        return jsonify({"error": "Unauthorized"}), 403
+    if TargetRole == "doctor" and requestor_role != "patient":
+        return jsonify({"error": "Unauthorized"}), 403
+    if TargetRole not in ["patient", "doctor"]:
+        return jsonify({"error": "Invalid Target Role"}), 400
+    
+    safe_user = user_info(email, TargetRole)
+    if safe_user is None:
+        return jsonify({"error": "User not found"}), 404
+    return safe_user
+
+
+# --- Patient History Update Route ---
+@app.route('/api/profile/patient/<email>', methods=['PUT'])
+@require_login(roles=["doctor"]) # Only doctors can update patient history
+def update_patient_history(email):
+    data = request.get_json() or {} # Ensure data is a dict even if no JSON is sent and to avoid crash
+
+    if "PatientHistory" not in data:
+        return jsonify({"error": "No Patient History provided"}), 400
+    
+    try:
+        updated = update_by_email(
+            table = "Patients",
+            email = email,
+            updates = {"PatientHistory": data["PatientHistory"]}
+        )
+    except ValueError as ve:
+        return jsonify({"error": str(ve)}), 400
+    
+    if updated == 0:
+        return jsonify({"error": "Patient not found"}), 404
+    
+    return jsonify({"status": "success", "message": "Patient history updated"})
 
 
 if __name__ == '__main__':

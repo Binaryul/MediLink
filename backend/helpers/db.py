@@ -43,3 +43,32 @@ def user_info(email, role):
     # No need to recheck for password here since this function is called only after successful login
 
     return dict(safe_user) if safe_user else None
+
+
+UPDATEABLE_COLUMNS = {
+    "Patients": {"Name", "Email", "PasswordHash", "PatientHistory"},
+    "Doctors": {"Name", "Email", "PasswordHash", "Specialisation"},
+    "Phamacies": {"Name", "Email", "PasswordHash"}
+}
+
+from typing import Any, Dict, Iterable
+def update_by_email(table: str, email: str, updates: Dict[str,Any]): # Force types on the inputs of the function
+    if table not in UPDATEABLE_COLUMNS:
+        raise ValueError("Invalid table name") 
+    
+    allowed_columns = UPDATEABLE_COLUMNS[table]
+    clean_update = {k:v for k,v in updates.items() if k in allowed_columns} # Filter only allowed columns (array comprehension I also dont fully understand the syntax for)
+    
+    if not clean_update:
+        raise ValueError("No valid columns to update")
+    
+    set_clause = ", ".join([f"{col} = ?" for col in clean_update.keys()])
+    values = list(clean_update.values()) + [email]
+
+    db = get_db()
+    cur = db.execute(
+        f"UPDATE {table} SET {set_clause} WHERE Email = ?", values
+    )
+    db.commit()
+
+    return cur.rowcount # Return number of rows updated and so I can detect "not found"
