@@ -13,7 +13,11 @@ from helpers.db import (
 )
 from helpers.auth import login_user
 from helpers.msg import get_patient_msg_history, append_message_history
-from helpers.medicine import fetch_prescription_details
+from helpers.medicine import (
+    fetch_prescription_details,
+    create_prescription,
+    delete_prescription_if_collectable,
+)
 
 # --- Flask App Setup ---
 
@@ -204,7 +208,7 @@ def send_message(patientID):
 
 
 @app.route('/api/prescriptions/<prescriptionID>', methods=['GET'])
-@require_login(roles=["patient", "doctor", "pharmacist"])
+@require_login()
 def get_prescription(prescriptionID):
     try:
         prescription = fetch_prescription_details(session["UserID"], session["Role"], prescriptionID)
@@ -215,6 +219,37 @@ def get_prescription(prescriptionID):
         return jsonify({"error": "Prescription not found"}), 404
 
     return jsonify({"status": "success", "prescription": prescription})
+
+
+@app.route('/api/prescriptions', methods=['POST'])
+@require_login(roles=["doctor"])
+def create_prescription_route():
+    data = request.get_json() or {}
+    try:
+        create_prescription(data)
+    except Exception:
+        return jsonify({"error": "Failed to create prescription"}), 400
+
+    return jsonify({"status": "success"}), 201
+
+
+@app.route('/api/prescriptions/<prescriptionID>', methods=['DELETE'])
+@require_login(roles=["pharmacist"])
+def delete_prescription_route(prescriptionID):
+    data = request.get_json() or {}
+    collection_code = data.get("CollectionCode")
+    if not collection_code:
+        return jsonify({"error": "Missing CollectionCode"}), 400
+
+    deleted = delete_prescription_if_collectable(
+        prescriptionID,
+        session["UserID"],
+        collection_code,
+    )
+    if not deleted:
+        return jsonify({"status": "success code changed"})
+
+    return jsonify({"status": "success prescription deleted"})
 
 
 if __name__ == '__main__':
