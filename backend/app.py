@@ -13,6 +13,7 @@ from helpers.db import (
 )
 from helpers.auth import login_user
 from helpers.msg import get_patient_msg_history, append_message_history
+from helpers.medicine import fetch_prescription_details
 
 # --- Flask App Setup ---
 
@@ -200,6 +201,20 @@ def send_message(patientID):
         return jsonify({"error": "Message history not found"}), 404
 
     return jsonify({"status": "success"})
+
+
+@app.route('/api/prescriptions/<prescriptionID>', methods=['GET'])
+@require_login(roles=["patient", "doctor", "pharmacist"])
+def get_prescription(prescriptionID):
+    try:
+        prescription = fetch_prescription_details(session["UserID"], session["Role"], prescriptionID)
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
+
+    if prescription is None:
+        return jsonify({"error": "Prescription not found"}), 404
+
+    return jsonify({"status": "success", "prescription": prescription})
 
 
 if __name__ == '__main__':
