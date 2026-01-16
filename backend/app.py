@@ -18,6 +18,7 @@ from helpers.medicine import (
     create_prescription,
     delete_prescription_if_collectable,
 )
+from helpers.audit import append_audit_log
 
 # --- Flask App Setup ---
 
@@ -50,6 +51,7 @@ def require_login(roles=None): # Gives me the option to use role or not
 
 @app.route('/api/ping', methods=['GET'])
 def ping():
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({'message': 'pong'})
 
 @app.route('/api/db_test', methods=['GET'])
@@ -59,11 +61,13 @@ def db_test():
         c = db.execute("SELECT 1;")
         result = c.fetchone()[0]
 
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
         return jsonify({
             'status': 'success',
             'result': result
         })
     except Exception as e:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({
             'status': 'error',
             'message': str(e)
@@ -78,9 +82,11 @@ def login(role):
     password = data.get("Password")
 
     if not email or not password:
+        append_audit_log(role, None, request.path, False)
         return jsonify({"error" : "Missing Credentials"}), 400
     user = login_user(email, password, role)
     if user is None:
+        append_audit_log(role, None, request.path, False)
         return jsonify({"error": "Invalid Credentials"}), 401
     
     # Remove sensitive information before sending response
@@ -96,6 +102,7 @@ def login(role):
     session["Email"] = safe_user["Email"]
     session["Role"] = role
 
+    append_audit_log(role, session.get("UserID"), request.path, True)
     return jsonify({
         "status": "success",
         "user": safe_user,
@@ -108,7 +115,14 @@ def register(role):
     data = request.get_json() or {}
     user, error, status = register_user(data, role)
     if error:
+        append_audit_log(role, None, request.path, False)
         return jsonify({"error": error}), status
+    append_audit_log(
+        role,
+        user.get("patientID") or user.get("doctorID") or user.get("pharmID"),
+        request.path,
+        True,
+    )
     return jsonify({
         "status": "success",
         "user": user,
@@ -118,6 +132,7 @@ def register(role):
 
 @app.route('/api/logout', methods=['POST'])
 def logout():
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     session.clear()
     return jsonify({"status": "logged out"})
 
@@ -130,7 +145,9 @@ def logout():
 def me():
     safe_user = user_info(session["UserID"], session["Role"])
     if safe_user is None:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "User not found"}), 404
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({
         "status": "success",
         "user": safe_user,
@@ -144,15 +161,20 @@ def me():
 def get_profile(TargetRole, userID):
     requestor_role = session["Role"]
     if TargetRole == "patient" and requestor_role != "doctor":
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Unauthorized"}), 403
     if TargetRole == "doctor" and requestor_role != "patient":
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Unauthorized"}), 403
     if TargetRole not in ["patient", "doctor"]:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Invalid Target Role"}), 400
 
     safe_user = user_info(userID, TargetRole)
     if safe_user is None:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "User not found"}), 404
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return safe_user
 
 
@@ -163,6 +185,7 @@ def update_patient_history(patientID):
     data = request.get_json() or {} # Ensure data is a dict even if no JSON is sent and to avoid crash
 
     if "PatientHistory" not in data:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "No Patient History provided"}), 400
     
     try:
@@ -172,11 +195,14 @@ def update_patient_history(patientID):
             updates = {"PatientHistory": json.dumps(data["PatientHistory"])}
         )
     except ValueError as ve:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": str(ve)}), 400
     
     if updated == 0:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Patient not found"}), 404
     
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success", "message": "Patient history updated"})
 
 
@@ -189,9 +215,11 @@ def get_messages(patientID):
         patientID = session["UserID"]
     else:
         if not is_doctor_enrolled(session["UserID"], patientID):
+            append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
             return jsonify({"error": "Unauthorized"}), 403
 
     histories = get_patient_msg_history(patientID)
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success", "messages": histories})
 
 
@@ -202,6 +230,7 @@ def send_message(patientID):
     message = data.get("message")
     timestamp = data.get("timestamp")
     if not message or not timestamp:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Missing message or timestamp"}), 400
 
     user_role = session["Role"]
@@ -211,12 +240,15 @@ def send_message(patientID):
         patientID = senderID
     else:
         if not is_doctor_enrolled(senderID, patientID):
+            append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
             return jsonify({"error": "Unauthorized"}), 403
 
     updated = append_message_history(patientID, senderID, message, timestamp)
     if updated <= 0:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Message history not found"}), 404
 
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success"})
 
 
@@ -226,11 +258,14 @@ def get_prescription(prescriptionID):
     try:
         prescription = fetch_prescription_details(session["UserID"], session["Role"], prescriptionID)
     except ValueError as exc:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": str(exc)}), 400
 
     if prescription is None:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Prescription not found"}), 404
 
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success", "prescription": prescription})
 
 
@@ -241,8 +276,10 @@ def create_prescription_route():
     try:
         create_prescription(data)
     except Exception:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Failed to create prescription"}), 400
 
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success"}), 201
 
 
@@ -252,6 +289,7 @@ def delete_prescription_route(prescriptionID):
     data = request.get_json() or {}
     collection_code = data.get("CollectionCode")
     if not collection_code:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
         return jsonify({"error": "Missing CollectionCode"}), 400
 
     deleted = delete_prescription_if_collectable(
@@ -260,8 +298,10 @@ def delete_prescription_route(prescriptionID):
         collection_code,
     )
     if not deleted:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
         return jsonify({"status": "success code changed"})
 
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success prescription deleted"})
 
 
