@@ -11,7 +11,7 @@ from helpers.db import (
     update_by_id,
     is_doctor_enrolled,
 )
-from helpers.auth import login_user
+from helpers.auth import login_user, register_user
 from helpers.msg import get_patient_msg_history, append_message_history
 from helpers.medicine import (
     fetch_prescription_details,
@@ -101,6 +101,19 @@ def login(role):
         "user": safe_user,
         "role": role
     })
+
+
+@app.route('/api/register/<role>', methods=['POST'])
+def register(role):
+    data = request.get_json() or {}
+    user, error, status = register_user(data, role)
+    if error:
+        return jsonify({"error": error}), status
+    return jsonify({
+        "status": "success",
+        "user": user,
+        "role": role
+    }), status
 
 
 @app.route('/api/logout', methods=['POST'])
