@@ -120,3 +120,17 @@ def update_by_email(table: str, email: str, updates: Dict[str,Any]): # Force typ
     db.commit()
 
     return cur.rowcount # Return number of rows updated and so I can detect "not found"
+
+
+def is_doctor_enrolled(doctorID: str, patientID: str) -> bool:
+    db = get_db()
+    row = db.execute(
+        """
+        SELECT 1
+        FROM DPEnrole
+        WHERE doctorID = ? AND patientID = ?
+        LIMIT 1
+        """,
+        (doctorID, patientID),
+    ).fetchone()
+    return row is not None # Return True if enrolled, False otherwise

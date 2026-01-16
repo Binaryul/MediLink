@@ -4,8 +4,15 @@ from datetime import timedelta
 from functools import wraps
 import json
 # --- Helper Imports ---
-from helpers.db import get_db, close_db, user_info, update_by_id
+from helpers.db import (
+    get_db,
+    close_db,
+    user_info,
+    update_by_id,
+    is_doctor_enrolled,
+)
 from helpers.auth import login_user
+from helpers.msg import get_patient_msg_history, append_message_history
 
 # --- Flask App Setup ---
 
@@ -143,7 +150,7 @@ def update_patient_history(patientID):
     try:
         updated = update_by_id(
             table = "Patients",
-            userID = patientID,
+            user_id = patientID,
             updates = {"PatientHistory": json.dumps(data["PatientHistory"])}
         )
     except ValueError as ve:
@@ -153,6 +160,46 @@ def update_patient_history(patientID):
         return jsonify({"error": "Patient not found"}), 404
     
     return jsonify({"status": "success", "message": "Patient history updated"})
+
+
+# --- Messaging Routes ---
+@app.route('/api/messages/<patientID>', methods=['GET'])
+@require_login(roles=["patient", "doctor"])
+def get_messages(patientID):
+    user_role = session["Role"]
+    if user_role == "patient":
+        patientID = session["UserID"]
+    else:
+        if not is_doctor_enrolled(session["UserID"], patientID):
+            return jsonify({"error": "Unauthorized"}), 403
+
+    histories = get_patient_msg_history(patientID)
+    return jsonify({"status": "success", "messages": histories})
+
+
+@app.route('/api/messages/<patientID>', methods=['POST'])
+@require_login(roles=["patient", "doctor"])
+def send_message(patientID):
+    data = request.get_json() or {}
+    message = data.get("message")
+    timestamp = data.get("timestamp")
+    if not message or not timestamp:
+        return jsonify({"error": "Missing message or timestamp"}), 400
+
+    user_role = session["Role"]
+    senderID = session["UserID"]
+
+    if user_role == "patient":
+        patientID = senderID
+    else:
+        if not is_doctor_enrolled(senderID, patientID):
+            return jsonify({"error": "Unauthorized"}), 403
+
+    updated = append_message_history(patientID, senderID, message, timestamp)
+    if updated <= 0:
+        return jsonify({"error": "Message history not found"}), 404
+
+    return jsonify({"status": "success"})
 
 
 if __name__ == '__main__':
