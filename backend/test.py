@@ -14,7 +14,7 @@ cipher = AES.new(key, AES.MODE_CBC, iv=iv)
 plaintext = b"Shush yo mouth Chopper D. Plug"
 ciphertext = cipher.encrypt(pad(plaintext, AES.block_size))
 
-print("Ciphertext (hex):", ciphertext.hex()) '''
+print("Ciphertext (hex):", ciphertext.hex()) 
 
 
 def test():
@@ -47,3 +47,4 @@ def test():
 
 
 test()
+'''

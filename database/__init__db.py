@@ -12,6 +12,7 @@ c.execute("""
 		doctorID TEXT NOT NULL PRIMARY KEY,
 		Name TEXT NOT NULL,
 		Email TEXT UNIQUE NOT NULL,
+        PasswordHash TEXT NOT NULL,
 		Specialisation TEXT
 		);
 """)
@@ -21,6 +22,7 @@ c.execute("""
 		patientID TEXT NOT NULL PRIMARY KEY,
 		Name TEXT NOT NULL,
 		Email TEXT UNIQUE NOT NULL,
+        PasswordHash TEXT NOT NULL,
 		PatientHistory TEXT,
 		DOB DATE NOT NULL 
 		);
@@ -29,6 +31,8 @@ c.execute("""
 c.execute("""
 	CREATE TABLE IF NOT EXISTS Pharmacies(
 		pharmID TEXT NOT NULL PRIMARY KEY,
+        Email TEXT UNIQUE NOT NULL,
+        PasswordHash TEXT NOT NULL,
 		Name TEXT NOT NULL
 	);
 """) 
@@ -46,7 +50,7 @@ c.execute("""
           msgHistory TEXT,
           PRIMARY KEY (doctorID, patientID)
           FOREIGN KEY (doctorID)
-          	REFERENCES Doctors (doctorID)
+          	REFERENCES Doctors (doctorID),
           FOREIGN KEY (patientID)
 			REFERENCES Patients (patientID) 
 	);
@@ -62,9 +66,9 @@ c.execute("""
           doctorID TEXT NOT NULL,
           pharmID TEXT NOT NULL,
           FOREIGN KEY (patientID)
-          	REFERENCES Patients (patientID)
+          	REFERENCES Patients (patientID),
           FOREIGN KEY (doctorID)
-          	REFERENCES Doctors (doctorID)
+          	REFERENCES Doctors (doctorID),
           FOREIGN KEY (pharmID)
           	REFERENCES Pharmacies (pharmID)
     );
@@ -93,7 +97,7 @@ c.execute("""
           noticeID TEXT UNIQUE NOT NULL,
           doctorID TEXT NOT NULL,
           FOREIGN KEY (patientID)
-			REFERENCES Patients (patientID)
+			REFERENCES Patients (patientID),
           FOREIGN KEY (doctorID)
 			REFERENCES Doctors (doctorID)
     );
