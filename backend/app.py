@@ -130,7 +130,8 @@ def register(role):
     }), status
 
 
-@app.route('/api/logout', methods=['POST'])
+@app.route('/api/logout', methods=['GET', 'POST'])
+@require_login()
 def logout():
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     session.clear()
