@@ -1,0 +1,86 @@
+.signupForm {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.input,
+.submitButton,
+.textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.input,
+.textarea,
+.passwordContainer {
+  margin-bottom: 15px;
+}
+
+.helperText {
+  margin: -8px 0 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.input.invalid {
+  border-color: red;
+  background-color: #ffe6e6;
+}
+
+.errorText {
+  color: red;
+  font-size: 12px;
+  margin-top: -10px;
+}
+
+.successText {
+  color: #2f8a3a;
+  font-size: 12px;
+  margin-top: -10px;
+}
+
+.submitButton {
+  font-size: 16px;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: var(--accent_dark);
+}
+
+.submitButton:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.passwordContainer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.togglePasswordButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-90%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #888;
+}

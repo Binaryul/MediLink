@@ -1,2 +1,5 @@
 {"route":"/api/login/pharmacist","userID":"PH00002","success":true,"time":"2026-01-20T10:19:50.836237+00:00"}
 {"route":"/api/login/pharmacist","userID":"PH00002","success":true,"time":"2026-01-20T10:19:59.328356+00:00"}
+{"route":"/api/register/pharmacist","userID":"RH00001","success":true,"time":"2026-02-05T13:42:38.517533+00:00"}
+{"route":"/api/login/pharmacist","userID":"RH00001","success":true,"time":"2026-02-05T13:43:00.761268+00:00"}
+{"route":"/api/me","userID":"RH00001","success":true,"time":"2026-02-05T13:43:06.670689+00:00"}

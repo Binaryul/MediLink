@@ -1,14 +1,14 @@
-import styles from "./LoginBox.module.css";
+import styles from "./SignupBox.module.css";
 import { useState } from "react";
 import type { CSSProperties } from "react";
-import UserLogin from "./UserLogin";
+import UserSignup from "./UserSignup";
 
-interface LoginBoxProps {
-  onSwitchToSignup?: () => void;
+interface SignupBoxProps {
+  onSwitchToLogin?: () => void;
 }
 
-function LoginBox({ onSwitchToSignup }: LoginBoxProps) {
-  const [activeTab, setActiveTab] = useState("Patient"); // Default to Patient tab
+function SignupBox({ onSwitchToLogin }: SignupBoxProps) {
+  const [activeTab, setActiveTab] = useState("Patient");
 
   function handleTabClick(tab: string) {
     setActiveTab(tab);
@@ -23,9 +23,8 @@ function LoginBox({ onSwitchToSignup }: LoginBoxProps) {
 
   return (
     <div className={styles.centerWrapper} style={themeVars}>
-      <div className={styles.loginBox}>
+      <div className={styles.signupBox}>
         <div className={styles.tabContainer}>
-          {/* Just buttons to decide which tab is active and call the function to set the active tab */}
           <button
             className={`${styles.tabButton} ${
               activeTab === "Patient" ? styles.active : ""
@@ -58,27 +57,26 @@ function LoginBox({ onSwitchToSignup }: LoginBoxProps) {
               transform: `translateX(${activeTab === "Patient" ? "0%" : activeTab === "Doctor" ? "-33.333%" : "-66.666%"})`,
             }}
           >
-            {/* Decide what text to show based on the active tab */}
             <div className={styles.slide}>
-              <UserLogin activeTab={activeTab} userType="Patient" />
+              <UserSignup activeTab={activeTab} userType="Patient" />
             </div>
             <div className={styles.slide}>
-              <UserLogin activeTab={activeTab} userType="Doctor" />
+              <UserSignup activeTab={activeTab} userType="Doctor" />
             </div>
             <div className={styles.slide}>
-              <UserLogin activeTab={activeTab} userType="Pharma" />
+              <UserSignup activeTab={activeTab} userType="Pharma" />
             </div>
           </div>
         </div>
         <div className={styles.footerRow}>
-          <span className={styles.footerText}>New to MediLink?</span>
+          <span className={styles.footerText}>Already have an account?</span>
           <button
             type="button"
             className={styles.linkButton}
-            onClick={onSwitchToSignup}
-            disabled={!onSwitchToSignup}
+            onClick={onSwitchToLogin}
+            disabled={!onSwitchToLogin}
           >
-            Create an account
+            Log in
           </button>
         </div>
       </div>
@@ -86,4 +84,4 @@ function LoginBox({ onSwitchToSignup }: LoginBoxProps) {
   );
 }
 
-export default LoginBox;
+export default SignupBox;
