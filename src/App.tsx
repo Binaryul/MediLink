@@ -4,6 +4,7 @@ import Header from "./assets/Header";
 import LoginBox from "./Login/LoginBox";
 import SignupBox from "./Signup/SignupBox";
 import PatientDashboard from "./Dashboard/PatientDashboard";
+import DoctorDashboard from "./Dashboard/DoctorDashboard";
 
 type AppView = "login" | "signup" | "dashboard";
 
@@ -79,6 +80,11 @@ function App() {
         />
       );
     }
+    if (userRole === "doctor") {
+      return (
+        <DoctorDashboard doctorName={userName} onLogout={handleLogout} />
+      );
+    }
   }
 
   return (
@@ -92,6 +98,12 @@ function App() {
               setUserName(user.Name || "User");
               setUserRole("patient");
               setUserId(user.patientID || null);
+              setAuthView("dashboard");
+            }}
+            onDoctorLogin={(user) => {
+              setUserName(user.Name || "User");
+              setUserRole("doctor");
+              setUserId(user.doctorID || null);
               setAuthView("dashboard");
             }}
           />

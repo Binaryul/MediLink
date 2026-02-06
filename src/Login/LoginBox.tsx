@@ -9,9 +9,17 @@ interface LoginBoxProps {
     Name?: string;
     patientID?: string;
   }) => void;
+  onDoctorLogin?: (user: {
+    Name?: string;
+    doctorID?: string;
+  }) => void;
 }
 
-function LoginBox({ onSwitchToSignup, onPatientLogin }: LoginBoxProps) {
+function LoginBox({
+  onSwitchToSignup,
+  onPatientLogin,
+  onDoctorLogin,
+}: LoginBoxProps) {
   const [activeTab, setActiveTab] = useState("Patient"); // Default to Patient tab
 
   function handleTabClick(tab: string) {
@@ -75,7 +83,15 @@ function LoginBox({ onSwitchToSignup, onPatientLogin }: LoginBoxProps) {
               />
             </div>
             <div className={styles.slide}>
-              <UserLogin activeTab={activeTab} userType="Doctor" />
+              <UserLogin
+                activeTab={activeTab}
+                userType="Doctor"
+                onLoginSuccess={(user, role) => {
+                  if (role === "doctor") {
+                    onDoctorLogin?.(user);
+                  }
+                }}
+              />
             </div>
             <div className={styles.slide}>
               <UserLogin activeTab={activeTab} userType="Pharma" />

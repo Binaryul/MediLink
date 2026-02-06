@@ -201,6 +201,27 @@ def get_assigned_doctor():
     return jsonify({"status": "success", "doctor": safe_user})
 
 
+# --- Doctor Patient List Route ---
+@app.route('/api/doctor/patients', methods=['GET'])
+@require_login(roles=["doctor"])
+def get_assigned_patients():
+    db = get_db()
+    rows = db.execute(
+        """
+        SELECT Patients.patientID, Patients.Name
+        FROM DPEnrole
+        JOIN Patients ON Patients.patientID = DPEnrole.patientID
+        WHERE DPEnrole.doctorID = ?
+        ORDER BY Patients.Name
+        """,
+        (session["UserID"],),
+    ).fetchall()
+
+    patients = [dict(row) for row in rows]
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
+    return jsonify({"status": "success", "patients": patients})
+
+
 # --- Patient History Update Route ---
 @app.route('/api/profile/patient/<patientID>', methods=['PUT'])
 @require_login(roles=["doctor"]) # Only doctors can update patient history
