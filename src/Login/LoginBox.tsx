@@ -5,9 +5,13 @@ import UserLogin from "./UserLogin";
 
 interface LoginBoxProps {
   onSwitchToSignup?: () => void;
+  onPatientLogin?: (user: {
+    Name?: string;
+    patientID?: string;
+  }) => void;
 }
 
-function LoginBox({ onSwitchToSignup }: LoginBoxProps) {
+function LoginBox({ onSwitchToSignup, onPatientLogin }: LoginBoxProps) {
   const [activeTab, setActiveTab] = useState("Patient"); // Default to Patient tab
 
   function handleTabClick(tab: string) {
@@ -60,7 +64,15 @@ function LoginBox({ onSwitchToSignup }: LoginBoxProps) {
           >
             {/* Decide what text to show based on the active tab */}
             <div className={styles.slide}>
-              <UserLogin activeTab={activeTab} userType="Patient" />
+              <UserLogin
+                activeTab={activeTab}
+                userType="Patient"
+                onLoginSuccess={(user, role) => {
+                  if (role === "patient") {
+                    onPatientLogin?.(user);
+                  }
+                }}
+              />
             </div>
             <div className={styles.slide}>
               <UserLogin activeTab={activeTab} userType="Doctor" />

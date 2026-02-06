@@ -31,7 +31,7 @@ def fetch_prescription_details(user_id: str, role: str, prescription_id: str) ->
 
     result = dict(row)
     # Remove sensitive fields based on role
-    if role in {"patient", "doctor"}:
+    if role == "doctor":
         result.pop("CollectionCode", None)
     elif role == "pharmacist":
         result.pop("patientID", None)

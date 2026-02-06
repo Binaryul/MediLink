@@ -179,6 +179,28 @@ def get_profile(TargetRole, userID):
     return safe_user
 
 
+# --- Patient Doctor Route ---
+@app.route('/api/patient/doctor', methods=['GET'])
+@require_login(roles=["patient"])
+def get_assigned_doctor():
+    db = get_db()
+    row = db.execute(
+        "SELECT doctorID FROM DPEnrole WHERE patientID = ? LIMIT 1",
+        (session["UserID"],),
+    ).fetchone()
+    if row is None:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Doctor not found"}), 404
+
+    safe_user = user_info(row["doctorID"], "doctor")
+    if safe_user is None:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Doctor not found"}), 404
+
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
+    return jsonify({"status": "success", "doctor": safe_user})
+
+
 # --- Patient History Update Route ---
 @app.route('/api/profile/patient/<patientID>', methods=['PUT'])
 @require_login(roles=["doctor"]) # Only doctors can update patient history
@@ -252,22 +274,45 @@ def send_message(patientID):
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success"})
 
+# --- Prescription Routes ---
 
-@app.route('/api/prescriptions/<prescriptionID>', methods=['GET'])
+@app.route('/api/prescriptions', methods=['GET'])
 @require_login()
-def get_prescription(prescriptionID):
-    try:
-        prescription = fetch_prescription_details(session["UserID"], session["Role"], prescriptionID)
-    except ValueError as exc:
+def get_prescriptions():
+    role = session["Role"]
+    role_column_map = {
+        "patient": "patientID",
+        "doctor": "doctorID",
+        "pharmacist": "pharmID",
+    }
+    role_column = role_column_map.get(role)
+    if role_column is None:
         append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
-        return jsonify({"error": str(exc)}), 400
+        return jsonify({"error": "Invalid role"}), 400
 
-    if prescription is None:
-        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
-        return jsonify({"error": "Prescription not found"}), 404
+    db = get_db()
+    rows = db.execute(
+        f"""
+        SELECT prescriptionID
+        FROM Prescriptions
+        WHERE {role_column} = ?
+        ORDER BY prescriptionID
+        """,
+        (session["UserID"],),
+    ).fetchall()
+
+    prescriptions = []
+    for row in rows:
+        prescription = fetch_prescription_details(
+            session["UserID"],
+            role, # The helper has logic to determine what details to show based on role so we can just pass it in
+            row["prescriptionID"],
+        )
+        if prescription is not None:
+            prescriptions.append(prescription)
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success", "prescription": prescription})
+    return jsonify({"status": "success", "prescriptions": prescriptions})
 
 
 @app.route('/api/prescriptions', methods=['POST'])

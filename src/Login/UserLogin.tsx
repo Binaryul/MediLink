@@ -10,9 +10,18 @@ import styles from "./UserLogin.module.css";
 interface UserLoginProps {
   activeTab: string;
   userType: "Patient" | "Doctor" | "Pharma";
+  onLoginSuccess?: (
+    user: {
+      Name?: string;
+      patientID?: string;
+      doctorID?: string;
+      pharmID?: string;
+    },
+    role: string,
+  ) => void;
 }
 
-function UserLogin({ activeTab, userType }: UserLoginProps) {
+function UserLogin({ activeTab, userType, onLoginSuccess }: UserLoginProps) {
   const [email, setEmail] = useState("");
   const [isValid, setIsValid] = useState(true);
   const [password, setPassword] = useState("");
@@ -96,11 +105,12 @@ function UserLogin({ activeTab, userType }: UserLoginProps) {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({ Email: email, Password: password }),
       });
       const result = await response.json();
       if (response.ok) {
-        alert(result.message || "Login successful.");
+        onLoginSuccess?.(result.user, role);
       } else {
         setError(result.error || result.message || "Login failed.");
       }
