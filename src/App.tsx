@@ -24,10 +24,10 @@ function App() {
         const response = await fetch("/api/me");
         const result = await response.json();
         if (!isActive) {
-          return; // If the component has unmounted, do not update state
+          return;
         }
         if (response.ok && result.role) {
-          setUserName(result.user?.Name || "User"); // Set the user's name if available, otherwise default to "User"
+          setUserName(result.user?.Name || "User");
           setUserRole(result.role);
           setUserId(
             result.user?.patientID ||
@@ -35,16 +35,16 @@ function App() {
               result.user?.pharmID ||
               null,
           );
-          setAuthView("dashboard"); // Show dashboard if session is valid and role is present
+          setAuthView("dashboard");
         }
       } catch {
         if (!isActive) {
           return;
         }
-        setAuthView("login"); // Show login if session check fails
+        setAuthView("login");
       } finally {
         if (isActive) {
-          setIsCheckingSession(false); // Session check is complete
+          setIsCheckingSession(false);
         }
       }
     }

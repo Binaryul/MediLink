@@ -136,7 +136,7 @@ export function PrescriptionsPanelContainer({
           const filtered = filterPatientId
             ? allPrescriptions.filter(
                 (prescription: Prescription) =>
-                  prescription.patientID === filterPatientId, // Filter prescriptions by patientID if filterPatientId is provided
+                  prescription.patientID === filterPatientId,
               )
             : allPrescriptions;
           setPrescriptions(filtered);

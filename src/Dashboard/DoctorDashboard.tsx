@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import Fuse from "fuse.js";
 import { MessagePanelContainer } from "../components/MessagePanel";
 import { PrescriptionsPanelContainer } from "../components/PrescriptionsPanel";
+import DashboardHeader from "../components/DashboardHeader";
+import SearchBar from "../components/SearchBar";
+import Modal from "../components/Modal";
 import styles from "./DoctorDashboard.module.css";
 
 interface DoctorDashboardProps {
@@ -242,7 +245,7 @@ function DoctorDashboard({
       setCreatePrescriptionError("Patient ID not available.");
       return;
     }
-    if (!newMedicineName.trim() || !newInstructions.trim() || !newPharmId.trim()) { // Basic validation to ensure required fields are filled
+    if (!newMedicineName.trim() || !newInstructions.trim() || !newPharmId.trim()) {
       setCreatePrescriptionError("Please fill in all fields.");
       return;
     }
@@ -255,7 +258,7 @@ function DoctorDashboard({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ // Send the necessary data to create a prescription
+        body: JSON.stringify({
           patientID: prescriptionsPatientId,
           pharmID: newPharmId.trim(),
           MedicineName: newMedicineName.trim(),
@@ -271,7 +274,6 @@ function DoctorDashboard({
         );
         return;
       }
-      // Reset form and reload prescriptions after successful creation
       setNewMedicineName("");
       setNewInstructions("");
       setNewDurationType("Lifetime");
@@ -293,14 +295,14 @@ function DoctorDashboard({
     setIsSavingHistory(true);
     setHistorySaveError("");
     try {
-      const parsed = tryParseJson(historyDraft); // Try to parse the draft, but if it fails, we'll just send the raw string
+      const parsed = tryParseJson(historyDraft);
       const response = await fetch(`/api/profile/patient/${activePatientId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          PatientHistory: parsed !== null ? parsed : historyDraft, // Send the parsed value if it's valid JSON, otherwise send the raw string
+          PatientHistory: parsed !== null ? parsed : historyDraft,
         }),
       });
       const result = await response.json();
@@ -308,7 +310,9 @@ function DoctorDashboard({
         setHistorySaveError(result.error || "Unable to save history.");
         return;
       }
-      setActivePatientProfile((prev) => prev ? { ...prev, PatientHistory: historyDraft } : prev);
+      setActivePatientProfile((prev) =>
+        prev ? { ...prev, PatientHistory: historyDraft } : prev,
+      );
       setIsEditingHistory(false);
     } catch (error) {
       setHistorySaveError("Unable to save history.");
@@ -367,22 +371,28 @@ function DoctorDashboard({
         if (parsed === null || typeof parsed === "string") {
           return parsed ?? value;
         }
-        if (Array.isArray(parsed)) { // Assuming it's an array of history entries
+        if (Array.isArray(parsed)) {
           return (
             <div className={styles.profileHistory}>
-              {parsed.map((item, index) => ( // Render each history entry, which could be a string or an object
-                <div key={`${key}-${index}`} className={styles.profileHistoryItem}>
+              {parsed.map((item, index) => (
+                <div
+                  key={`${key}-${index}`}
+                  className={styles.profileHistoryItem}
+                >
                   {typeof item === "string" ? item : JSON.stringify(item)}
                 </div>
               ))}
             </div>
           );
         }
-        if (parsed && typeof parsed === "object") { // Assuming it's an object with history details
+        if (parsed && typeof parsed === "object") {
           return (
             <div className={styles.profileHistory}>
-              {Object.entries(parsed).map(([entryKey, entryValue]) => ( // Render each key-value pair in the history object
-                <div key={`${key}-${entryKey}`} className={styles.profileHistoryItem}>
+              {Object.entries(parsed).map(([entryKey, entryValue]) => (
+                <div
+                  key={`${key}-${entryKey}`}
+                  className={styles.profileHistoryItem}
+                >
                   {entryKey}:{" "}
                   {typeof entryValue === "string"
                     ? entryValue
@@ -401,37 +411,30 @@ function DoctorDashboard({
 
   return (
     <div className={styles.page}>
-      <header className={styles.topBar}>
-        <div className={styles.userMeta}>
-          <div className={styles.greeting}>Hello {doctorName}</div>
-          <div className={styles.userId}>
-            ID: {doctorId || "Unavailable"}
-          </div>
-        </div>
-        <button className={styles.logoutButton} type="button" onClick={onLogout}>
-          Log out
-        </button>
-      </header>
+      <DashboardHeader
+        className={styles.topBar}
+        metaClassName={styles.userMeta}
+        greetingClassName={styles.greeting}
+        idClassName={styles.userId}
+        logoutButtonClassName={styles.logoutButton}
+        name={doctorName}
+        idValue={doctorId || "Unavailable"}
+        onLogout={onLogout}
+      />
       <main className={styles.main}>
-        <section className={styles.searchBar}>
-          <input
-            className={styles.searchInput}
-            type="text"
-            placeholder={`Search by ${searchField}`}
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-          />
-          <select
-            className={styles.searchSelect}
-            value={searchField}
-            onChange={(event) =>
-              setSearchField(event.target.value as "Name" | "patientID")
-            }
-          >
-            <option value="Name">Name</option>
-            <option value="patientID">Patient ID</option>
-          </select>
-        </section>
+        <SearchBar
+          className={styles.searchBar}
+          inputClassName={styles.searchInput}
+          selectClassName={styles.searchSelect}
+          query={searchQuery}
+          onQueryChange={setSearchQuery}
+          field={searchField}
+          onFieldChange={setSearchField}
+          options={[
+            { value: "Name", label: "Name" },
+            { value: "patientID", label: "Patient ID" },
+          ]}
+        />
         <section className={styles.card}>
           <div className={styles.cardHeader}>
             <h2 className={styles.cardTitle}>Assigned Patients</h2>
@@ -487,217 +490,213 @@ function DoctorDashboard({
         </section>
       </main>
       {(activePatientProfile || activePatientError || isProfileLoading) && (
-        <div className={styles.modalOverlay} role="dialog" aria-modal="true">
-          <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>Patient Details</h2>
-              <button
-                className={styles.modalClose}
-                type="button"
-                onClick={handleCloseProfile}
-              >
-                Close
-              </button>
-            </div>
-            {isProfileLoading ? (
-              <div className={styles.modalBody}>Loading patient...</div>
-            ) : activePatientError ? (
-              <div className={styles.modalBody}>{activePatientError}</div>
-            ) : (
-              <div className={styles.modalBody}>
-                {activePatientProfile &&
-                  Object.entries(activePatientProfile).map(([key, value]) => (
-                    <div key={key} className={styles.profileRow}>
-                      <span className={styles.profileLabel}>{key}:</span>{" "}
-                      <span className={styles.profileValue}>
-                        {renderProfileValue(key, value)}
-                      </span>
-                      {key === "PatientHistory" && !isEditingHistory && (
-                        <button
-                          className={styles.secondaryButton}
-                          type="button"
-                        onClick={() => {
-                            const { draft } = normalizeHistoryValue(value); // Prepare the draft for editing
-                            setHistoryDraft(draft);
-                            setHistorySaveError("");
-                            setIsEditingHistory(true);
-                          }}
-                        >
-                          Edit
-                        </button>
-                      )}
-                    </div>
-                  ))}
+        <Modal
+          overlayClassName={styles.modalOverlay}
+          modalClassName={styles.modal}
+          headerClassName={styles.modalHeader}
+          titleClassName={styles.modalTitle}
+          closeButtonClassName={styles.modalClose}
+          bodyClassName={styles.modalBody}
+          title="Patient Details"
+          onClose={handleCloseProfile}
+        >
+          {isProfileLoading ? (
+            <div>Loading patient...</div>
+          ) : activePatientError ? (
+            <div>{activePatientError}</div>
+          ) : (
+            activePatientProfile &&
+            Object.entries(activePatientProfile).map(([key, value]) => (
+              <div key={key} className={styles.profileRow}>
+                <span className={styles.profileLabel}>{key}:</span>{" "}
+                <span className={styles.profileValue}>
+                  {renderProfileValue(key, value)}
+                </span>
+                {key === "PatientHistory" && !isEditingHistory && (
+                  <button
+                    className={styles.secondaryButton}
+                    type="button"
+                    onClick={() => {
+                      const { draft } = normalizeHistoryValue(value);
+                      setHistoryDraft(draft);
+                      setHistorySaveError("");
+                      setIsEditingHistory(true);
+                    }}
+                  >
+                    Edit
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+            ))
+          )}
+        </Modal>
       )}
       {isMessageOpen && (
-        <div className={styles.modalOverlay} role="dialog" aria-modal="true">
-          <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>
-                Messages with {messagePatientName}
-              </h2>
+        <Modal
+          overlayClassName={styles.modalOverlay}
+          modalClassName={styles.modal}
+          headerClassName={styles.modalHeader}
+          titleClassName={styles.modalTitle}
+          closeButtonClassName={styles.modalClose}
+          bodyClassName={styles.modalBody}
+          title={`Messages with ${messagePatientName}`}
+          onClose={handleCloseMessages}
+        >
+          {messagePatientId ? (
+            <MessagePanelContainer
+              title="Conversation"
+              fetchUrl={`/api/messages/${messagePatientId}`}
+              postUrl={`/api/messages/${messagePatientId}`}
+              currentUserId={doctorId}
+              otherLabel="Patient"
+            />
+          ) : (
+            <div>Patient ID not available.</div>
+          )}
+        </Modal>
+      )}
+      {isPrescriptionsOpen && (
+        <Modal
+          overlayClassName={styles.modalOverlay}
+          modalClassName={styles.modal}
+          headerClassName={styles.modalHeader}
+          titleClassName={styles.modalTitle}
+          bodyClassName={styles.modalBody}
+          title={`Prescriptions for ${prescriptionsPatientName}`}
+          showCloseButton={false}
+          headerActions={
+            <div className={styles.modalActions}>
+              <button
+                className={styles.secondaryButton}
+                type="button"
+                onClick={() => {
+                  const nextOpen = !isCreatePrescriptionOpen;
+                  setIsCreatePrescriptionOpen(nextOpen);
+                  if (!nextOpen) {
+                    setNewMedicineName("");
+                    setNewInstructions("");
+                    setNewDurationType("Lifetime");
+                    setNewPharmId("");
+                    setCreatePrescriptionError("");
+                    setIsCreatingPrescription(false);
+                  }
+                }}
+              >
+                {isCreatePrescriptionOpen ? "Hide Form" : "Create"}
+              </button>
               <button
                 className={styles.modalClose}
                 type="button"
-                onClick={handleCloseMessages}
+                onClick={handleClosePrescriptions}
               >
                 Close
               </button>
             </div>
-            <div className={styles.modalBody}>
-              {messagePatientId ? (
-                <MessagePanelContainer
-                  title="Conversation"
-                  fetchUrl={`/api/messages/${messagePatientId}`}
-                  postUrl={`/api/messages/${messagePatientId}`}
-                  currentUserId={doctorId}
-                  otherLabel="Patient"
-                />
-              ) : (
-                <div>Patient ID not available.</div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-      {isPrescriptionsOpen && (
-        <div className={styles.modalOverlay} role="dialog" aria-modal="true">
-          <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h2 className={styles.modalTitle}>
-                Prescriptions for {prescriptionsPatientName}
-              </h2>
-              <div className={styles.modalActions}>
-                <button
-                  className={styles.secondaryButton}
-                  type="button"
-                  onClick={() => {
-                    const nextOpen = !isCreatePrescriptionOpen;
-                    setIsCreatePrescriptionOpen(nextOpen);
-                    if (!nextOpen) {
-                      setNewMedicineName("");
-                      setNewInstructions("");
-                      setNewDurationType("Lifetime");
-                      setNewPharmId("");
-                      setCreatePrescriptionError("");
-                      setIsCreatingPrescription(false);
-                    }
-                  }}
-                >
-                  {isCreatePrescriptionOpen ? "Hide Form" : "Create"}
-                </button>
-                <button
-                  className={styles.modalClose}
-                  type="button"
-                  onClick={handleClosePrescriptions}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-            <div className={styles.modalBody}>
-              {prescriptionsPatientId ? (
-                <>
-                  {isCreatePrescriptionOpen && (
-                    <div className={styles.createSection}>
-                      <div className={styles.formRow}>
-                        <label className={styles.formLabel} htmlFor="med-name">
-                          Medicine Name
-                        </label>
-                        <input
-                          id="med-name"
-                          className={styles.formInput}
-                          type="text"
-                          value={newMedicineName}
-                          onChange={(event) => setNewMedicineName(event.target.value)}
-                        />
-                      </div>
-                      <div className={styles.formRow}>
-                        <label className={styles.formLabel} htmlFor="med-instructions">
-                          Instructions
-                        </label>
-                        <input
-                          id="med-instructions"
-                          className={styles.formInput}
-                          type="text"
-                          value={newInstructions}
-                          onChange={(event) => setNewInstructions(event.target.value)}
-                        />
-                      </div>
-                      <div className={styles.formRow}>
-                        <label className={styles.formLabel} htmlFor="pharm-id">
-                          Pharmacy ID
-                        </label>
-                        <input
-                          id="pharm-id"
-                          className={styles.formInput}
-                          type="text"
-                          value={newPharmId}
-                          onChange={(event) => setNewPharmId(event.target.value)}
-                        />
-                      </div>
-                      <div className={styles.formRow}>
-                        <span className={styles.formLabel}>Duration</span>
-                        <div className={styles.toggleGroup}>
-                          <button
-                            className={`${styles.toggleButton} ${
-                              newDurationType === "Lifetime"
-                                ? styles.toggleButtonActive
-                                : ""
-                            }`}
-                            type="button"
-                            onClick={() => setNewDurationType("Lifetime")}
-                          >
-                            Lifetime
-                          </button>
-                          <button
-                            className={`${styles.toggleButton} ${
-                              newDurationType === "Temporary"
-                                ? styles.toggleButtonActive
-                                : ""
-                            }`}
-                            type="button"
-                            onClick={() => setNewDurationType("Temporary")}
-                          >
-                            Temporary
-                          </button>
-                        </div>
-                      </div>
-                      {createPrescriptionError && (
-                        <div className={styles.formError}>
-                          {createPrescriptionError}
-                        </div>
-                      )}
-                      <div className={styles.formActions}>
-                        <button
-                          className={styles.primaryButton}
-                          type="button"
-                          onClick={handleCreatePrescription}
-                          disabled={isCreatingPrescription}
-                        >
-                          {isCreatingPrescription ? "Creating..." : "Save"}
-                        </button>
-                      </div>
+          }
+        >
+          {prescriptionsPatientId ? (
+            <>
+              {isCreatePrescriptionOpen && (
+                <div className={styles.createSection}>
+                  <div className={styles.formRow}>
+                    <label className={styles.formLabel} htmlFor="med-name">
+                      Medicine Name
+                    </label>
+                    <input
+                      id="med-name"
+                      className={styles.formInput}
+                      type="text"
+                      value={newMedicineName}
+                      onChange={(event) =>
+                        setNewMedicineName(event.target.value)
+                      }
+                    />
+                  </div>
+                  <div className={styles.formRow}>
+                    <label
+                      className={styles.formLabel}
+                      htmlFor="med-instructions"
+                    >
+                      Instructions
+                    </label>
+                    <input
+                      id="med-instructions"
+                      className={styles.formInput}
+                      type="text"
+                      value={newInstructions}
+                      onChange={(event) =>
+                        setNewInstructions(event.target.value)
+                      }
+                    />
+                  </div>
+                  <div className={styles.formRow}>
+                    <label className={styles.formLabel} htmlFor="pharm-id">
+                      Pharmacy ID
+                    </label>
+                    <input
+                      id="pharm-id"
+                      className={styles.formInput}
+                      type="text"
+                      value={newPharmId}
+                      onChange={(event) => setNewPharmId(event.target.value)}
+                    />
+                  </div>
+                  <div className={styles.formRow}>
+                    <span className={styles.formLabel}>Duration</span>
+                    <div className={styles.toggleGroup}>
+                      <button
+                        className={`${styles.toggleButton} ${
+                          newDurationType === "Lifetime"
+                            ? styles.toggleButtonActive
+                            : ""
+                        }`}
+                        type="button"
+                        onClick={() => setNewDurationType("Lifetime")}
+                      >
+                        Lifetime
+                      </button>
+                      <button
+                        className={`${styles.toggleButton} ${
+                          newDurationType === "Temporary"
+                            ? styles.toggleButtonActive
+                            : ""
+                        }`}
+                        type="button"
+                        onClick={() => setNewDurationType("Temporary")}
+                      >
+                        Temporary
+                      </button>
+                    </div>
+                  </div>
+                  {createPrescriptionError && (
+                    <div className={styles.formError}>
+                      {createPrescriptionError}
                     </div>
                   )}
-                  <PrescriptionsPanelContainer
-                    title="Prescriptions"
-                    fetchUrl="/api/prescriptions"
-                    filterPatientId={prescriptionsPatientId}
-                    emptyMessage="No prescriptions for this patient."
-                    reloadToken={prescriptionsReloadToken}
-                  />
-                </>
-              ) : (
-                <div>Patient ID not available.</div>
+                  <div className={styles.formActions}>
+                    <button
+                      className={styles.primaryButton}
+                      type="button"
+                      onClick={handleCreatePrescription}
+                      disabled={isCreatingPrescription}
+                    >
+                      {isCreatingPrescription ? "Creating..." : "Save"}
+                    </button>
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
-        </div>
+              <PrescriptionsPanelContainer
+                title="Prescriptions"
+                fetchUrl="/api/prescriptions"
+                filterPatientId={prescriptionsPatientId}
+                emptyMessage="No prescriptions for this patient."
+                reloadToken={prescriptionsReloadToken}
+              />
+            </>
+          ) : (
+            <div>Patient ID not available.</div>
+          )}
+        </Modal>
       )}
     </div>
   );

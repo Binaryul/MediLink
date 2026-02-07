@@ -43,7 +43,7 @@ function UserLogin({ activeTab, userType, onLoginSuccess }: UserLoginProps) {
   }, [activeTab, userType]);
 
   function togglePasswordVisibility() {
-    setPasswordVisible((prev) => !prev); // Toggle the state each time the function is called
+    setPasswordVisible((prev) => !prev);
   }
 
   function isValidEmail(value: string) {
@@ -82,7 +82,7 @@ function UserLogin({ activeTab, userType, onLoginSuccess }: UserLoginProps) {
     }
   }
 
-  async function handleSubmit() { 
+  async function handleSubmit() {
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
@@ -134,7 +134,7 @@ function UserLogin({ activeTab, userType, onLoginSuccess }: UserLoginProps) {
       />
       <div className={styles.passwordContainer}>
         <input
-          type={passwordVisible ? "text" : "password"} // Change the type based on visibility state (password type has it hidden)
+          type={passwordVisible ? "text" : "password"}
           placeholder="Password"
           value={password}
           onChange={handlePasswordChange}
@@ -148,7 +148,7 @@ function UserLogin({ activeTab, userType, onLoginSuccess }: UserLoginProps) {
           onClick={togglePasswordVisibility}
           className={styles.togglePasswordButton}
         >
-          {passwordVisible ? "Shown" : "Hidden"} {/* Switch the button text based on visibility state */}
+          {passwordVisible ? "Shown" : "Hidden"}
         </button>
       </div>
       {error && <p className={styles.errorText}>{error}</p>}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { MessagePanelContainer } from "../components/MessagePanel";
 import { PrescriptionsPanelContainer } from "../components/PrescriptionsPanel";
+import DashboardHeader from "../components/DashboardHeader";
 import styles from "./PatientDashboard.module.css";
 
 interface PatientDashboardProps {
@@ -51,17 +52,16 @@ function PatientDashboard({
 
   return (
     <div className={styles.page}>
-      <header className={styles.topBar}>
-        <div className={styles.userMeta}>
-          <div className={styles.greeting}>Hello {patientName}</div>
-          <div className={styles.userId}>
-            ID: {patientId || "Unavailable"}
-          </div>
-        </div>
-        <button className={styles.logoutButton} type="button" onClick={onLogout}>
-          Log out
-        </button>
-      </header>
+      <DashboardHeader
+        className={styles.topBar}
+        metaClassName={styles.userMeta}
+        greetingClassName={styles.greeting}
+        idClassName={styles.userId}
+        logoutButtonClassName={styles.logoutButton}
+        name={patientName}
+        idValue={patientId || "Unavailable"}
+        onLogout={onLogout}
+      />
       <main className={styles.main}>
         <PrescriptionsPanelContainer
           title="My Prescriptions"

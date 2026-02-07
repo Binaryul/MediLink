@@ -6,12 +6,12 @@ from Crypto.Util.Padding import pad, unpad
 
 from helpers.db import get_db
 
-# Matches the fixed AES-256 test settings used when populating the database. Should be replaced with secure key management in production.
+# TODO: replace test key/iv with secure key management before production.
 KEY = b"0123456789abcdef0123456789abcdef"
 IV = b"abcdef0123456789"
 
 
-def _safe_json_loads(raw: Any) -> Any: # Safely load JSON, returning empty list on failure
+def _safe_json_loads(raw: Any) -> Any:
     if raw is None:
         return []
     if isinstance(raw, (list, dict)):
@@ -26,7 +26,7 @@ def _safe_json_loads(raw: Any) -> Any: # Safely load JSON, returning empty list 
 
 def _decrypt_message(ciphertext_hex: str) -> str:
     ciphertext = bytes.fromhex(ciphertext_hex)
-    cipher = AES.new(KEY, AES.MODE_CBC, iv=IV) # Just using the library
+    cipher = AES.new(KEY, AES.MODE_CBC, iv=IV)
     plaintext = unpad(cipher.decrypt(ciphertext), AES.block_size)
     return plaintext.decode("utf-8")
 
@@ -42,7 +42,7 @@ def _decrypt_history(msg_history: Any) -> List[Dict[str, Any]]:
     if not isinstance(items, list):
         return []
 
-    decrypted: List[Dict[str, Any]] = [] # an empty list to hold decrypted messages enforced types so it looks different
+    decrypted: List[Dict[str, Any]] = []
     for item in items:
         if not isinstance(item, dict):
             continue
@@ -52,7 +52,6 @@ def _decrypt_history(msg_history: Any) -> List[Dict[str, Any]]:
                 item = dict(item)
                 item["message"] = _decrypt_message(msg)
             except Exception:
-                # Keep the original message if it's already plaintext or malformed.
                 pass
         decrypted.append(item)
     return decrypted

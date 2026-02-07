@@ -7,7 +7,7 @@ interface UserSignupProps {
 }
 
 function UserSignup({ activeTab, userType }: UserSignupProps) {
-  const [name, setName] = useState(""); // Coundn't find a better way to do it other than declare them all here
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [doctorId, setDoctorId] = useState("");
   const [dob, setDob] = useState("");
@@ -21,7 +21,7 @@ function UserSignup({ activeTab, userType }: UserSignupProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (activeTab === userType) { // Set all fields to default states
+    if (activeTab === userType) {
       setName("");
       setEmail("");
       setDoctorId("");
@@ -102,8 +102,7 @@ function UserSignup({ activeTab, userType }: UserSignupProps) {
     setStatusMessage("");
     setIsError(false);
     setIsLoading(true);
-    // Changes the user type to the correct format for the backend 
-    const role = userType === "Pharma" ? "pharmacist" : userType.toLowerCase(); // if Pharma, change to pharmacist, else just lowercase the userType
+    const role = userType === "Pharma" ? "pharmacist" : userType.toLowerCase();
     const endpoint = `/api/register/${role}`;
     const payload: Record<string, string | null> = {
       Name: name,
@@ -116,7 +115,7 @@ function UserSignup({ activeTab, userType }: UserSignupProps) {
       payload.DOB = dob;
       payload.PatientHistory = patientHistory.trim()
         ? patientHistory.trim()
-        : null; // Only include patient history if it's not just whitespace, otherwise set it to null
+        : null;
     }
 
     if (userType === "Doctor" && specialisation.trim()) {

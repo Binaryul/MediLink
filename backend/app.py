@@ -1,9 +1,7 @@
 from flask import Flask, jsonify, request, session
 from flask_cors import CORS
-from datetime import timedelta
 from functools import wraps
 import json
-# --- Helper Imports ---
 from helpers.db import (
     get_db,
     close_db,
@@ -20,60 +18,26 @@ from helpers.medicine import (
 )
 from helpers.audit import append_audit_log
 
-# --- Flask App Setup ---
-
 app = Flask(__name__)
 CORS(app)
 
-app.teardown_appcontext(close_db) # Close DB connection after each request
-app.secret_key = "ThisIsASecretKey" # In production, use a secure key from environment variables
+app.teardown_appcontext(close_db)
+# TODO: move to an env var before production
+app.secret_key = "ThisIsASecretKey"
 
-# --- Route Protection Decorator ---
-
-def require_login(roles=None): # Gives me the option to use role or not
-    def decorator(f): 
-        @wraps(f) # used to keep Flask happy just a techincal requirment
+def require_login(roles=None):
+    def decorator(f):
+        @wraps(f)
         def wrapper(*args, **kwargs):
             if "UserID" not in session:
                 return jsonify({"error": "Not logged in"}), 401
             if roles is not None:
                 if session["Role"] not in roles:
                     return jsonify({"error": "Unauthorized"}), 403
-            return f(*args, **kwargs) # Call the actual route function
+            return f(*args, **kwargs)
         return wrapper
     return decorator
 
-
-# --- Route Configurations ---
-
-
-# - Test Routes -
-
-@app.route('/api/ping', methods=['GET'])
-def ping():
-    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({'message': 'pong'})
-
-@app.route('/api/db_test', methods=['GET'])
-def db_test():
-    try:
-        db = get_db()
-        c = db.execute("SELECT 1;")
-        result = c.fetchone()[0]
-
-        append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-        return jsonify({
-            'status': 'success',
-            'result': result
-        })
-    except Exception as e:
-        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        })
-
-# --- Authentication Routes ---
 
 @app.route('/api/login/<role>', methods=['POST'])
 def login(role):
@@ -89,7 +53,6 @@ def login(role):
         append_audit_log(role, None, request.path, False)
         return jsonify({"error": "Invalid Credentials"}), 401
     
-    # Remove sensitive information before sending response
     safe_user = {k:v for k, v in user.items() if k != "PasswordHash"}
 
     session.permanent = True
@@ -104,7 +67,6 @@ def login(role):
 
     append_audit_log(role, session.get("UserID"), request.path, True)
     return jsonify({
-        "status": "success",
         "user": safe_user,
         "role": role
     })
@@ -123,11 +85,7 @@ def register(role):
         request.path,
         True,
     )
-    return jsonify({
-        "status": "success",
-        "user": user,
-        "role": role
-    }), status
+    return jsonify({}), status
 
 
 @app.route('/api/logout', methods=['GET', 'POST'])
@@ -135,10 +93,7 @@ def register(role):
 def logout():
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     session.clear()
-    return jsonify({"status": "logged out"})
-
-
-# --- User Info Route ---
+    return jsonify({})
 
 
 @app.route('/api/me', methods=['GET'])
@@ -150,15 +105,13 @@ def me():
         return jsonify({"error": "User not found"}), 404
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({
-        "status": "success",
         "user": safe_user,
         "role": session["Role"]
     })
 
 
-# --- User Profile Routes ---
 @app.route('/api/profile/<TargetRole>/<userID>', methods=['GET'])
-@require_login() # Only doctors can access patient profiles since patients should only access their own profile via /api/me
+@require_login()
 def get_profile(TargetRole, userID):
     requestor_role = session["Role"]
     if TargetRole == "patient" and requestor_role != "doctor":
@@ -179,7 +132,6 @@ def get_profile(TargetRole, userID):
     return safe_user
 
 
-# --- Patient Doctor Route ---
 @app.route('/api/patient/doctor', methods=['GET'])
 @require_login(roles=["patient"])
 def get_assigned_doctor():
@@ -198,10 +150,9 @@ def get_assigned_doctor():
         return jsonify({"error": "Doctor not found"}), 404
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success", "doctor": safe_user})
+    return jsonify({"doctor": safe_user})
 
 
-# --- Doctor Patient List Route ---
 @app.route('/api/doctor/patients', methods=['GET'])
 @require_login(roles=["doctor"])
 def get_assigned_patients():
@@ -219,14 +170,13 @@ def get_assigned_patients():
 
     patients = [dict(row) for row in rows]
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success", "patients": patients})
+    return jsonify({"patients": patients})
 
 
-# --- Patient History Update Route ---
 @app.route('/api/profile/patient/<patientID>', methods=['PUT'])
-@require_login(roles=["doctor"]) # Only doctors can update patient history
+@require_login(roles=["doctor"])
 def update_patient_history(patientID):
-    data = request.get_json() or {} # Ensure data is a dict even if no JSON is sent and to avoid crash
+    data = request.get_json() or {}
 
     if "PatientHistory" not in data:
         append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
@@ -247,10 +197,9 @@ def update_patient_history(patientID):
         return jsonify({"error": "Patient not found"}), 404
     
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success", "message": "Patient history updated"})
+    return jsonify({})
 
 
-# --- Messaging Routes ---
 @app.route('/api/messages/<patientID>', methods=['GET'])
 @require_login(roles=["patient", "doctor"])
 def get_messages(patientID):
@@ -264,7 +213,7 @@ def get_messages(patientID):
 
     histories = get_patient_msg_history(patientID)
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success", "messages": histories})
+    return jsonify({"messages": histories})
 
 
 @app.route('/api/messages/<patientID>', methods=['POST'])
@@ -293,9 +242,7 @@ def send_message(patientID):
         return jsonify({"error": "Message history not found"}), 404
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success"})
-
-# --- Prescription Routes ---
+    return jsonify({})
 
 @app.route('/api/prescriptions', methods=['GET'])
 @require_login()
@@ -326,14 +273,14 @@ def get_prescriptions():
     for row in rows:
         prescription = fetch_prescription_details(
             session["UserID"],
-            role, # The helper has logic to determine what details to show based on role so we can just pass it in
+            role,
             row["prescriptionID"],
         )
         if prescription is not None:
             prescriptions.append(prescription)
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success", "prescriptions": prescriptions})
+    return jsonify({"prescriptions": prescriptions})
 
 
 @app.route('/api/prescriptions', methods=['POST'])
@@ -348,7 +295,7 @@ def create_prescription_route():
         return jsonify({"error": "Failed to create prescription"}), 400
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success"}), 201
+    return jsonify({}), 201
 
 
 @app.route('/api/prescriptions/<prescriptionID>', methods=['DELETE'])
@@ -380,4 +327,4 @@ def delete_prescription_route(prescriptionID):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5173, debug=True) # sending the app through the same port the frontend is served on
+    app.run(host='0.0.0.0', port=5173)

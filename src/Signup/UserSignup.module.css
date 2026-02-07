@@ -22,7 +22,7 @@
   min-height: 80px;
 }
 
-.input.invalid {
+.invalid {
   composes: invalidField from '../styles/auth.form.shared.module.css';
 }
 

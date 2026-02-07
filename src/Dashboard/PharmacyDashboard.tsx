@@ -3,6 +3,8 @@ import Fuse from "fuse.js";
 import PrescriptionsPanel, {
   type Prescription,
 } from "../components/PrescriptionsPanel";
+import DashboardHeader from "../components/DashboardHeader";
+import SearchBar from "../components/SearchBar";
 import styles from "./PharmacyDashboard.module.css";
 
 interface PharmacyDashboardProps {
@@ -89,7 +91,7 @@ function PharmacyDashboard({
   const canCollect = isCodeValid && !!selectedPrescriptionId && !isCollecting;
 
   function handleCodeChange(value: string) {
-    const digitsOnly = value.replace(/\D/g, "").slice(0, 6); // Remove non-digit characters and limit to 6 digits
+    const digitsOnly = value.replace(/\D/g, "").slice(0, 6);
     setCollectionCode(digitsOnly);
     if (collectError) {
       setCollectError("");
@@ -100,7 +102,7 @@ function PharmacyDashboard({
   }
 
   async function handleCollect() {
-    if (!selectedPrescriptionId) { // Added but maybe not needed since button is disabled when !selectedPrescriptionId
+    if (!selectedPrescriptionId) {
       setCollectError("Select a prescription first.");
       return;
     }
@@ -124,7 +126,7 @@ function PharmacyDashboard({
       );
       const result = await response.json();
       if (response.ok) {
-        setCollectStatus(result.status || "Collection verified."); // Show success message from backend or default message
+        setCollectStatus(result.status || "Collection verified.");
         setCollectionCode("");
         setSelectedPrescriptionId(null);
         await fetchPrescriptions();
@@ -140,15 +142,16 @@ function PharmacyDashboard({
 
   return (
     <div className={styles.page}>
-      <header className={styles.topBar}>
-        <div className={styles.userMeta}>
-          <div className={styles.greeting}>{pharmacistName}</div>
-          <div className={styles.userId}>ID: {pharmId || "Unavailable"}</div>
-        </div>
-        <button className={styles.logoutButton} type="button" onClick={onLogout}>
-          Log out
-        </button>
-      </header>
+      <DashboardHeader
+        className={styles.topBar}
+        metaClassName={styles.userMeta}
+        greetingClassName={styles.greeting}
+        idClassName={styles.userId}
+        logoutButtonClassName={styles.logoutButton}
+        name={pharmacistName}
+        idValue={pharmId || "Unavailable"}
+        onLogout={onLogout}
+      />
       <main className={styles.main}>
         <section className={styles.collectBar}>
           <div className={styles.collectInputGroup}>
@@ -181,31 +184,20 @@ function PharmacyDashboard({
             {collectError || collectStatus}
           </div>
         )}
-        <section className={styles.searchBar}>
-          <input
-            className={styles.searchInput}
-            type="text"
-            placeholder={`Search by ${searchField}`}
-            value={searchQuery}
-            onChange={(event) => setSearchQuery(event.target.value)}
-          />
-          <select
-            className={styles.searchSelect}
-            value={searchField}
-            onChange={(event) =>
-              setSearchField(
-                event.target.value as
-                  | "MedicineName"
-                  | "patientID"
-                  | "prescriptionID",
-              )
-            }
-          >
-            <option value="MedicineName">Medicine</option>
-            <option value="patientID">Patient ID</option>
-            <option value="prescriptionID">Prescription ID</option>
-          </select>
-        </section>
+        <SearchBar
+          className={styles.searchBar}
+          inputClassName={styles.searchInput}
+          selectClassName={styles.searchSelect}
+          query={searchQuery}
+          onQueryChange={setSearchQuery}
+          field={searchField}
+          onFieldChange={setSearchField}
+          options={[
+            { value: "MedicineName", label: "Medicine" },
+            { value: "patientID", label: "Patient ID" },
+            { value: "prescriptionID", label: "Prescription ID" },
+          ]}
+        />
         <PrescriptionsPanel
           title="Assigned Prescriptions"
           prescriptions={filteredPrescriptions}

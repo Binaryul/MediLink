@@ -25,7 +25,7 @@ function LoginBox({
   onDoctorLogin,
   onPharmaLogin,
 }: LoginBoxProps) {
-  const [activeTab, setActiveTab] = useState("Patient"); // Default to Patient tab
+  const [activeTab, setActiveTab] = useState("Patient");
 
   function handleTabClick(tab: string) {
     setActiveTab(tab);
@@ -42,7 +42,6 @@ function LoginBox({
     <div className={styles.centerWrapper} style={themeVars}>
       <div className={styles.loginBox}>
         <div className={styles.tabContainer}>
-          {/* Just buttons to decide which tab is active and call the function to set the active tab */}
           <button
             className={`${styles.tabButton} ${
               activeTab === "Patient" ? styles.active : ""
@@ -75,7 +74,6 @@ function LoginBox({
               transform: `translateX(${activeTab === "Patient" ? "0%" : activeTab === "Doctor" ? "-33.333%" : "-66.666%"})`,
             }}
           >
-            {/* Decide what text to show based on the active tab */}
             <div className={styles.slide}>
               <UserLogin
                 activeTab={activeTab}

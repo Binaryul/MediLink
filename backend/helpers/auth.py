@@ -5,7 +5,7 @@ import string
 from werkzeug.security import check_password_hash, generate_password_hash
 from helpers.db import get_db, ROLE_ID_COLUMN
 
-def login_user(email:str, password:str, role: str): # enforce types and get the needed database connection info
+def login_user(email:str, password:str, role: str):
     db = get_db()
 
     table_map = {
@@ -16,23 +16,22 @@ def login_user(email:str, password:str, role: str): # enforce types and get the 
 
     table = table_map.get(role)
     if not table:
-        return None  # Invalid role
+        return None
     
     user = db.execute(
         f"SELECT * FROM {table} WHERE email = ?", (email,)
     ).fetchone()
 
     if user and check_password_hash(user["PasswordHash"], password):
-        return dict(user) # Convert Row object to dictionary
+        return dict(user)
     return None
 
 
-def _name_prefix(_: str) -> str: # Generate a random 2-letter prefix for user IDs
+def _name_prefix(_: str) -> str:
     return "".join(random.choice(string.ascii_uppercase) for _ in range(2))
 
 
-# Generate the next user ID based on the highest existing ID with the same prefix
-def _next_user_id(table: str, id_column: str, prefix: str) -> str: 
+def _next_user_id(table: str, id_column: str, prefix: str) -> str:
     db = get_db()
     row = db.execute(
         f"""
@@ -70,7 +69,6 @@ def register_user(data: dict, role: str):
     password = data.get("Password")
 
     if role == "patient":
-        # Ensure the doctor exists before creating the patient+enrollment pair.
         if not _doctor_exists(data.get("doctorID")):
             return None, "Invalid doctorID", 400
 
@@ -82,13 +80,12 @@ def register_user(data: dict, role: str):
     if existing:
         return None, "Email already registered", 409
 
-    prefix = _name_prefix(name) 
+    prefix = _name_prefix(name)
     id_column = ROLE_ID_COLUMN[role]
     user_id = _next_user_id(table, id_column, prefix)
     password_hash = generate_password_hash(password)
 
     if role == "patient":
-        # Normalize patient history to a JSON string for storage.
         patient_history = data.get("PatientHistory")
         if patient_history is None:
             patient_history = json.dumps({})
@@ -128,7 +125,6 @@ def register_user(data: dict, role: str):
             insert_values,
         )
         if role == "patient":
-            # Create the initial enrollment row for the doctor-patient link.
             db.execute(
                 """
                 INSERT INTO DPEnrole (doctorID, patientID, msgHistory)

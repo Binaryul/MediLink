@@ -10,7 +10,7 @@
   composes: submitButton from '../styles/auth.form.shared.module.css';
 }
 
-.input.invalid {
+.invalid {
   composes: invalidField from '../styles/auth.form.shared.module.css';
 }
 
