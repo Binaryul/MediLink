@@ -341,6 +341,7 @@ def get_prescriptions():
 def create_prescription_route():
     data = request.get_json() or {}
     try:
+        data["doctorID"] = session["UserID"]
         create_prescription(data)
     except Exception:
         append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)

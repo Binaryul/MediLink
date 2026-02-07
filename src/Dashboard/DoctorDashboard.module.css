@@ -168,6 +168,17 @@
   align-self: flex-start;
 }
 
+.secondaryActionButton {
+  background: #ffffff;
+  color: #2f8a3a;
+  border: 1px solid rgba(47, 138, 58, 0.35);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
 .modalOverlay {
   position: fixed;
   inset: 0;
@@ -213,6 +224,12 @@
   cursor: pointer;
 }
 
+.modalActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .modalBody {
   padding: 16px 20px 20px;
   overflow: auto;
@@ -232,6 +249,67 @@
 
 .profileValue {
   color: #4b5565;
+}
+
+.createSection {
+  background: #f7fbf8;
+  border: 1px solid #e1eee4;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f3b4a;
+}
+
+.formInput {
+  border: 1px solid #d7e2ea;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.toggleButton {
+  border: 1px solid rgba(47, 138, 58, 0.35);
+  background: #ffffff;
+  color: #2f8a3a;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggleButtonActive {
+  background: #2f8a3a;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.formError {
+  color: #b42318;
+  font-size: 13px;
 }
 
 .historyEditor {

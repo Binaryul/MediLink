@@ -5,6 +5,7 @@ import LoginBox from "./Login/LoginBox";
 import SignupBox from "./Signup/SignupBox";
 import PatientDashboard from "./Dashboard/PatientDashboard";
 import DoctorDashboard from "./Dashboard/DoctorDashboard";
+import PharmacyDashboard from "./Dashboard/PharmacyDashboard";
 
 type AppView = "login" | "signup" | "dashboard";
 
@@ -89,6 +90,15 @@ function App() {
         />
       );
     }
+    if (userRole === "pharmacist") {
+      return (
+        <PharmacyDashboard
+          pharmacistName={userName}
+          pharmId={userId}
+          onLogout={handleLogout}
+        />
+      );
+    }
   }
 
   return (
@@ -108,6 +118,12 @@ function App() {
               setUserName(user.Name || "User");
               setUserRole("doctor");
               setUserId(user.doctorID || null);
+              setAuthView("dashboard");
+            }}
+            onPharmaLogin={(user) => {
+              setUserName(user.Name || "User");
+              setUserRole("pharmacist");
+              setUserId(user.pharmID || null);
               setAuthView("dashboard");
             }}
           />

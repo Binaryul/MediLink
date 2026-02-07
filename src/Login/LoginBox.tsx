@@ -13,12 +13,17 @@ interface LoginBoxProps {
     Name?: string;
     doctorID?: string;
   }) => void;
+  onPharmaLogin?: (user: {
+    Name?: string;
+    pharmID?: string;
+  }) => void;
 }
 
 function LoginBox({
   onSwitchToSignup,
   onPatientLogin,
   onDoctorLogin,
+  onPharmaLogin,
 }: LoginBoxProps) {
   const [activeTab, setActiveTab] = useState("Patient"); // Default to Patient tab
 
@@ -94,7 +99,15 @@ function LoginBox({
               />
             </div>
             <div className={styles.slide}>
-              <UserLogin activeTab={activeTab} userType="Pharma" />
+              <UserLogin
+                activeTab={activeTab}
+                userType="Pharma"
+                onLoginSuccess={(user, role) => {
+                  if (role === "pharmacist") {
+                    onPharmaLogin?.(user);
+                  }
+                }}
+              />
             </div>
           </div>
         </div>

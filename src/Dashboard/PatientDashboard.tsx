@@ -1,16 +1,7 @@
 import { useEffect, useState } from "react";
 import { MessagePanelContainer } from "../components/MessagePanel";
+import { PrescriptionsPanelContainer } from "../components/PrescriptionsPanel";
 import styles from "./PatientDashboard.module.css";
-
-interface Prescription {
-  prescriptionID?: string;
-  MedicineName?: string;
-  Instructions?: string;
-  DatePrescribed?: string;
-  DurationType?: string;
-  CollectionCode?: string;
-}
-
 
 interface PatientDashboardProps {
   patientName: string;
@@ -27,8 +18,6 @@ function PatientDashboard({
     Record<string, string | number> | null
   >(null);
   const [doctorError, setDoctorError] = useState("");
-  const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
-  const [prescriptionError, setPrescriptionError] = useState("");
 
   useEffect(() => {
     let isActive = true;
@@ -60,38 +49,6 @@ function PatientDashboard({
     };
   }, []);
 
-  useEffect(() => {
-    let isActive = true;
-
-    async function fetchPrescriptions() {
-      try {
-        const response = await fetch("/api/prescriptions");
-        const result = await response.json();
-        if (!isActive) {
-          return;
-        }
-        if (response.ok) {
-          setPrescriptions(result.prescriptions || []);
-        } else {
-          setPrescriptionError(
-            result.error || "Unable to load prescriptions.",
-          );
-        }
-      } catch {
-        if (!isActive) {
-          return;
-        }
-        setPrescriptionError("Unable to load prescriptions.");
-      }
-    }
-
-    fetchPrescriptions();
-
-    return () => {
-      isActive = false;
-    };
-  }, []);
-
   return (
     <div className={styles.page}>
       <header className={styles.topBar}>
@@ -106,57 +63,10 @@ function PatientDashboard({
         </button>
       </header>
       <main className={styles.main}>
-        <section className={styles.card}>
-          <div className={styles.cardHeader}>
-            <h2 className={styles.cardTitle}>My Prescriptions</h2>
-          </div>
-          <ul className={styles.prescriptionList}>
-            {prescriptions.length > 0 ? (
-              prescriptions.map((prescription, index) => (
-                <li
-                  key={prescription.prescriptionID || `${index}`}
-                  className={styles.prescriptionItem}
-                >
-                  <div className={styles.prescriptionMain}>
-                    <div className={styles.listTitle}>
-                      {prescription.MedicineName || "Prescription"}
-                    </div>
-                    <div className={styles.listSub}>
-                      {prescription.Instructions || "No instructions provided"}
-                    </div>
-                    <div className={styles.listMeta}>
-                      {prescription.DatePrescribed
-                        ? `Prescribed on ${prescription.DatePrescribed}`
-                        : "Prescription date unavailable"}
-                    </div>
-                  </div>
-                  <div className={styles.prescriptionMeta}>
-                    <span
-                      className={`${styles.statusPill} ${
-                        prescription.DurationType === "Temporary"
-                          ? styles.statusExpired
-                          : styles.statusActive
-                      }`}
-                    >
-                      {prescription.DurationType || "Active"}
-                    </span>
-                    {prescription.CollectionCode && (
-                      <span className={styles.refills}>
-                        Code: {prescription.CollectionCode}
-                      </span>
-                    )}
-                  </div>
-                </li>
-              ))
-            ) : (
-              <li className={styles.prescriptionItem}>
-                <div className={styles.listSub}>
-                  {prescriptionError || "No prescriptions available."}
-                </div>
-              </li>
-            )}
-          </ul>
-        </section>
+        <PrescriptionsPanelContainer
+          title="My Prescriptions"
+          fetchUrl="/api/prescriptions"
+        />
 
         <MessagePanelContainer
           title="Messages with Doctor"
