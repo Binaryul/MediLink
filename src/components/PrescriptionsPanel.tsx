@@ -15,6 +15,8 @@ interface PrescriptionsPanelProps {
   title: string;
   prescriptions: Prescription[];
   emptyMessage?: string;
+  onSelect?: (prescription: Prescription) => void;
+  selectedPrescriptionId?: string | null;
 }
 
 interface PrescriptionsPanelContainerProps {
@@ -29,6 +31,8 @@ function PrescriptionsPanel({
   title,
   prescriptions,
   emptyMessage = "No prescriptions available.",
+  onSelect,
+  selectedPrescriptionId,
 }: PrescriptionsPanelProps) {
   return (
     <section className={styles.card}>
@@ -40,7 +44,29 @@ function PrescriptionsPanel({
           prescriptions.map((prescription, index) => (
             <li
               key={prescription.prescriptionID || `${index}`}
-              className={styles.prescriptionItem}
+              className={`${styles.prescriptionItem} ${
+                onSelect ? styles.prescriptionSelectable : ""
+              } ${
+                prescription.prescriptionID &&
+                prescription.prescriptionID === selectedPrescriptionId
+                  ? styles.prescriptionSelected
+                  : ""
+              }`}
+              onClick={
+                onSelect ? () => onSelect(prescription) : undefined
+              }
+              onKeyDown={
+                onSelect
+                  ? (event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelect(prescription);
+                      }
+                    }
+                  : undefined
+              }
+              role={onSelect ? "button" : undefined}
+              tabIndex={onSelect ? 0 : undefined}
             >
               <div className={styles.prescriptionMain}>
                 <div className={styles.listTitle}>

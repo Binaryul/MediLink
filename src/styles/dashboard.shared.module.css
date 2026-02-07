@@ -1,0 +1,64 @@
+.page {
+  min-height: 100vh;
+  background: var(--color-surface-muted);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.topBarBase {
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+}
+
+.greeting {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.userId {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
+.logoutButtonBase {
+  background: var(--color-surface);
+  border: none;
+  padding: 8px 16px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.logoutButtonBase:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.main {
+  padding: 28px 32px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.searchBarBase {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--color-surface);
+  border-radius: 14px;
+  padding: 12px 16px;
+  box-shadow: var(--shadow-card);
+}

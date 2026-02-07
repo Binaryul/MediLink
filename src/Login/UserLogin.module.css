@@ -1,72 +1,33 @@
 .loginForm {
-  font-family: Arial, Helvetica, sans-serif;
 }
 
-.input,
-.submitButton {
-  width: 100%; /* Ensure all elements span the full width of the container */
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box; /* Include padding in width calculation */
+.input {
+  composes: field from '../styles/auth.form.shared.module.css';
+  composes: fieldSpacing from '../styles/auth.form.shared.module.css';
 }
-.input,
-.passwordContainer {
-  margin-bottom: 15px; /* Add spacing between fields */
+
+.submitButton {
+  composes: submitButton from '../styles/auth.form.shared.module.css';
 }
 
 .input.invalid {
-  border-color: red;
-  background-color: #ffe6e6;
+  composes: invalidField from '../styles/auth.form.shared.module.css';
 }
 
 .errorText {
-  color: red;
-  font-size: 12px;
-  margin-top: -10px;
-}
-
-.submitButton {
-  font-size: 16px;
-  background-color: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.submitButton:hover {
-  background-color: var(--accent_dark);
-}
-
-.submitButton:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+  composes: errorText from '../styles/auth.form.shared.module.css';
 }
 
 .passwordContainer {
-  position: relative;
-  width: 100%; /* Match input field width */
-  display: flex;
-  align-items: center;
+  composes: passwordContainer from '../styles/auth.form.shared.module.css';
+  composes: fieldSpacing from '../styles/auth.form.shared.module.css';
 }
 
 .passwordInput {
-  width: 100%; /* Match input field width */
+  composes: field from '../styles/auth.form.shared.module.css';
   padding-right: 40px;
-  box-sizing: border-box;
 }
 
 .togglePasswordButton {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-90%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  color: #888;
+  composes: togglePasswordButton from '../styles/auth.form.shared.module.css';
 }

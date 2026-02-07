@@ -1,103 +1,47 @@
 .centerWrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh; /* Full viewport height */
-  width: 100vw; /* Full viewport width */
-  background-color: #f5f5f5; /* Optional: Add a background color */
-  margin: 0; /* Remove any default margins */
-  box-sizing: border-box;
+  composes: centerWrapper from '../styles/auth.shared.module.css';
 }
 
 /* Login Box Container */
 .loginBox {
+  composes: authBox from '../styles/auth.shared.module.css';
   width: 400px;
-  background: #ffffff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  overflow: hidden;
 }
 
 /* Tab Container Styles */
 .tabContainer {
-  display: flex;
-  justify-content: space-around;
-  background-color: #f7f7f7;
-  border-bottom: 2px solid #eaeaea;
+  composes: tabContainer from '../styles/auth.shared.module.css';
 }
 
 .tabButton {
-  flex: 1;
-  padding: 10px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  color: #666;
-  transition: color 0.3s ease, border-bottom 0.3s ease;
+  composes: tabButton from '../styles/auth.shared.module.css';
 }
 
-.tabButton:hover {
-  color: #000;
-}
-
-.tabButton.active {
-  color: #000;
-  border-bottom: 3px solid var(--accent);
+.active {
+  composes: tabButtonActive from '../styles/auth.shared.module.css';
 }
 
 /* Sliding Animation Container */
 .sliderContainer {
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  height: auto;
+  composes: sliderContainer from '../styles/auth.shared.module.css';
 }
 
 .slider {
-  display: flex;
-  width: 300%;
-  transition: transform 500ms cubic-bezier(0.4, 0, 1, 1);
+  composes: slider from '../styles/auth.shared.module.css';
 }
 
 .slide {
-  flex: 1;
-  width: 100%;
-  box-sizing: border-box;
-  padding: 20px;
+  composes: slide from '../styles/auth.shared.module.css';
 }
 
 .footerRow {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding: 0 20px 20px;
-  font-size: 14px;
-  color: #666;
+  composes: footerRow from '../styles/auth.shared.module.css';
 }
 
 .footerText {
-  margin: 0;
+  composes: footerText from '../styles/auth.shared.module.css';
 }
 
 .linkButton {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--accent);
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.linkButton:hover {
-  color: var(--accent_dark);
-  text-decoration: underline;
-}
-
-.linkButton:disabled {
-  color: #aaa;
-  cursor: default;
-  text-decoration: none;
+  composes: linkButton from '../styles/auth.shared.module.css';
 }

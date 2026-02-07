@@ -1,81 +1,44 @@
 .page {
-  min-height: 100vh;
-  background: #f5f7fb;
-  color: #1d2433;
-  margin: 0;
+  composes: page from '../styles/dashboard.shared.module.css';
 }
 
 .topBar {
+  composes: topBarBase from '../styles/dashboard.shared.module.css';
   background-color: #1e6fd9;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 32px;
   box-shadow: 0 4px 10px rgba(30, 111, 217, 0.2);
 }
 
 .greeting {
-  font-size: 20px;
-  font-weight: 600;
+  composes: greeting from '../styles/dashboard.shared.module.css';
 }
 
 .userMeta {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  composes: userMeta from '../styles/dashboard.shared.module.css';
 }
 
 .userId {
-  font-size: 12px;
-  opacity: 0.85;
+  composes: userId from '../styles/dashboard.shared.module.css';
 }
 
 .logoutButton {
-  background: #ffffff;
+  composes: logoutButtonBase from '../styles/dashboard.shared.module.css';
   color: #1e6fd9;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 999px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.logoutButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .main {
-  padding: 28px 32px 40px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  max-width: 980px;
-  margin: 0 auto;
+  composes: main from '../styles/dashboard.shared.module.css';
 }
 
 .card {
-  background: #ffffff;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+  composes: card from '../styles/card.shared.module.css';
 }
 
 .cardHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  composes: cardHeader from '../styles/card.shared.module.css';
 }
 
 .cardTitle {
-  font-size: 18px;
-  margin: 0;
+  composes: cardTitle from '../styles/card.shared.module.css';
 }
 
 
@@ -87,7 +50,7 @@
 
 .doctorDetail {
   font-size: 14px;
-  color: #6a7384;
+  color: var(--color-text-muted);
 }
 
 .doctorLabel {
@@ -96,7 +59,7 @@
 }
 
 .doctorValue {
-  color: #6a7384;
+  color: var(--color-text-muted);
   word-break: break-word;
 }
 

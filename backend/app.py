@@ -365,12 +365,18 @@ def delete_prescription_route(prescriptionID):
         session["UserID"],
         collection_code,
     )
-    if not deleted:
+    if deleted == "invalid_code":
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Invalid collection code"}), 400
+    if deleted == "not_found":
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Prescription not found"}), 404
+    if deleted == "code_changed":
         append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-        return jsonify({"status": "success code changed"})
+        return jsonify({"status": "Prescription Collected and Code Changed"})
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success prescription deleted"})
+    return jsonify({"status": "Prescription Collected and Deleted"})
 
 
 if __name__ == '__main__':

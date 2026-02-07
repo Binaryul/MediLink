@@ -52,8 +52,8 @@ def fetch_prescription_details(user_id: str, role: str, prescription_id: str) ->
     if role == "doctor":
         result.pop("CollectionCode", None)
     elif role == "pharmacist":
-        result.pop("patientID", None)
         result.pop("doctorID", None)
+        result.pop("CollectionCode", None)
 
     return result
 
@@ -100,7 +100,11 @@ def create_prescription(data: Dict[str, Any]) -> None:
     db.commit()
 
 
-def delete_prescription_if_collectable(prescription_id: str, pharm_id: str, collection_code: str) -> bool:
+def delete_prescription_if_collectable(
+    prescription_id: str,
+    pharm_id: str,
+    collection_code: str,
+) -> str:
     db = get_db()
     row = db.execute(
         """
@@ -112,10 +116,10 @@ def delete_prescription_if_collectable(prescription_id: str, pharm_id: str, coll
     ).fetchone()
 
     if row is None:
-        return False
+        return "not_found"
 
     if row["CollectionCode"] != collection_code:
-        return False
+        return "invalid_code"
 
     if row["DurationType"] != "Temporary":
         new_code = f"{random.randint(0, 999999):06d}"
@@ -124,8 +128,8 @@ def delete_prescription_if_collectable(prescription_id: str, pharm_id: str, coll
             (new_code, prescription_id),
         )
         db.commit()
-        return False
+        return "code_changed"
 
     db.execute("DELETE FROM Prescriptions WHERE prescriptionID = ?", (prescription_id,))
     db.commit()
-    return True
+    return "deleted"
