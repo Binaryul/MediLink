@@ -111,50 +111,17 @@ c.executemany("""
 
 #--------------------- Inserting sample data into the Prescriptions table
 prescription_data = [
-    ("BM00001", "RX00001", "TC00001", "MC00001"),
-    ("SK00001", "RX00002", "GH00002", "PH00002")
+    ("BM00001", "RX00001", "TC00001", "MC00001", "Medicine A, Medicine B", "Take twice daily after meals", "2025-12-11", "Lifetime", "123456"),
+    ("SK00001", "RX00002", "GH00002", "PH00002", "Medicine C", "Take once daily before bed", "2025-06-30", "Temporary", "654321")
 ]
 c.executemany("""
-    INSERT OR IGNORE INTO Prescriptions (patientID, prescriptionID, doctorID, pharmID)
-    VALUES (?, ?, ?, ?);
+    INSERT OR IGNORE INTO Prescriptions (patientID, prescriptionID, doctorID, pharmID, MedicineName, Instructions, DatePrescribed, DurationType, CollectionCode)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
 """, 
     prescription_data
 )
 
 
-#--------------------- Inserting sample data into the Medicines table
-medicines_data = [
-    ("RX00001", "Medicine A, Medicine B", "Take twice daily after meals", "2025-12-11", "Lifetime", "123456"),
-    ("RX00002", "Medicine C", "Take once daily before bed", "2025-06-30", "Temporary", "654321")
-]
-c.executemany("""
-    INSERT OR IGNORE INTO Medicines (prescriptionID, MedicineName, Instructions, DatePrescribed, DurationType, CollectionCode)
-    VALUES (?, ?, ?, ?, ?, ?);
-""", 
-    medicines_data
-)
-
-#---------------------- Inserting Notices Data
-notices_data = [
-    ("BM00001", "NT00001", "TC00001"),
-]
-c.executemany("""
-    INSERT OR IGNORE INTO Notices (patientID, noticeID, doctorID)
-    VALUES (?, ?, ?);
-""", 
-    notices_data
-)
-
-#---------------------- Notice Content Data
-notice_content_data = [
-    ("NT00001", "2025-12-11","Your appointment is scheduled for 2024-11-20 at 10:00 AM."),
-]
-c.executemany("""
-    INSERT OR IGNORE INTO NoticeContent (noticeID, Date, Message)
-    VALUES (?, ?, ?);
-""", 
-    notice_content_data
-)
 
 conn.commit()
 conn.close()

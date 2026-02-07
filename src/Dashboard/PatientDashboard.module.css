@@ -1,0 +1,78 @@
+.page {
+  composes: page from '../styles/dashboard.shared.module.css';
+}
+
+.topBar {
+  composes: topBarBase from '../styles/dashboard.shared.module.css';
+  background-color: #1e6fd9;
+  box-shadow: 0 4px 10px rgba(30, 111, 217, 0.2);
+}
+
+.greeting {
+  composes: greeting from '../styles/dashboard.shared.module.css';
+}
+
+.userMeta {
+  composes: userMeta from '../styles/dashboard.shared.module.css';
+}
+
+.userId {
+  composes: userId from '../styles/dashboard.shared.module.css';
+}
+
+.logoutButton {
+  composes: logoutButtonBase from '../styles/dashboard.shared.module.css';
+  color: #1e6fd9;
+}
+
+.main {
+  composes: main from '../styles/dashboard.shared.module.css';
+}
+
+.card {
+  composes: card from '../styles/card.shared.module.css';
+}
+
+.cardHeader {
+  composes: cardHeader from '../styles/card.shared.module.css';
+}
+
+.cardTitle {
+  composes: cardTitle from '../styles/card.shared.module.css';
+}
+
+
+.doctorInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.doctorDetail {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.doctorLabel {
+  font-weight: 600;
+  color: #3b4657;
+}
+
+.doctorValue {
+  color: var(--color-text-muted);
+  word-break: break-word;
+}
+
+@media (max-width: 720px) {
+  .topBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+
+}

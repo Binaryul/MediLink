@@ -1,0 +1,47 @@
+.centerWrapper {
+  composes: centerWrapper from '../styles/auth.shared.module.css';
+}
+
+/* Login Box Container */
+.loginBox {
+  composes: authBox from '../styles/auth.shared.module.css';
+  width: 400px;
+}
+
+/* Tab Container Styles */
+.tabContainer {
+  composes: tabContainer from '../styles/auth.shared.module.css';
+}
+
+.tabButton {
+  composes: tabButton from '../styles/auth.shared.module.css';
+}
+
+.active {
+  composes: tabButtonActive from '../styles/auth.shared.module.css';
+}
+
+/* Sliding Animation Container */
+.sliderContainer {
+  composes: sliderContainer from '../styles/auth.shared.module.css';
+}
+
+.slider {
+  composes: slider from '../styles/auth.shared.module.css';
+}
+
+.slide {
+  composes: slide from '../styles/auth.shared.module.css';
+}
+
+.footerRow {
+  composes: footerRow from '../styles/auth.shared.module.css';
+}
+
+.footerText {
+  composes: footerText from '../styles/auth.shared.module.css';
+}
+
+.linkButton {
+  composes: linkButton from '../styles/auth.shared.module.css';
+}

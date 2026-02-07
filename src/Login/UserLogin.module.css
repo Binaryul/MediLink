@@ -1,0 +1,33 @@
+.loginForm {
+}
+
+.input {
+  composes: field from '../styles/auth.form.shared.module.css';
+  composes: fieldSpacing from '../styles/auth.form.shared.module.css';
+}
+
+.submitButton {
+  composes: submitButton from '../styles/auth.form.shared.module.css';
+}
+
+.input.invalid {
+  composes: invalidField from '../styles/auth.form.shared.module.css';
+}
+
+.errorText {
+  composes: errorText from '../styles/auth.form.shared.module.css';
+}
+
+.passwordContainer {
+  composes: passwordContainer from '../styles/auth.form.shared.module.css';
+  composes: fieldSpacing from '../styles/auth.form.shared.module.css';
+}
+
+.passwordInput {
+  composes: field from '../styles/auth.form.shared.module.css';
+  padding-right: 40px;
+}
+
+.togglePasswordButton {
+  composes: togglePasswordButton from '../styles/auth.form.shared.module.css';
+}

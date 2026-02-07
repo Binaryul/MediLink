@@ -1,35 +1,138 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useEffect, useState } from "react";
+import Header from "./assets/Header";
+import LoginBox from "./Login/LoginBox";
+import SignupBox from "./Signup/SignupBox";
+import PatientDashboard from "./Dashboard/PatientDashboard";
+import DoctorDashboard from "./Dashboard/DoctorDashboard";
+import PharmacyDashboard from "./Dashboard/PharmacyDashboard";
+
+type AppView = "login" | "signup" | "dashboard";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [authView, setAuthView] = useState<AppView>("login");
+  const [userName, setUserName] = useState("User");
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isCheckingSession, setIsCheckingSession] = useState(true);
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function checkSession() {
+      try {
+        const response = await fetch("/api/me");
+        const result = await response.json();
+        if (!isActive) {
+          return; // If the component has unmounted, do not update state
+        }
+        if (response.ok && result.role) {
+          setUserName(result.user?.Name || "User"); // Set the user's name if available, otherwise default to "User"
+          setUserRole(result.role);
+          setUserId(
+            result.user?.patientID ||
+              result.user?.doctorID ||
+              result.user?.pharmID ||
+              null,
+          );
+          setAuthView("dashboard"); // Show dashboard if session is valid and role is present
+        }
+      } catch {
+        if (!isActive) {
+          return;
+        }
+        setAuthView("login"); // Show login if session check fails
+      } finally {
+        if (isActive) {
+          setIsCheckingSession(false); // Session check is complete
+        }
+      }
+    }
+
+    checkSession();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  async function handleLogout() {
+    try {
+      await fetch("/api/logout", { method: "POST" });
+    } finally {
+      setAuthView("login");
+      setUserName("User");
+      setUserRole(null);
+      setUserId(null);
+    }
+  }
+
+  if (isCheckingSession) {
+    return null;
+  }
+
+  if (authView === "dashboard") {
+    if (userRole === "patient") {
+      return (
+        <PatientDashboard
+          patientName={userName}
+          patientId={userId}
+          onLogout={handleLogout}
+        />
+      );
+    }
+    if (userRole === "doctor") {
+      return (
+        <DoctorDashboard
+          doctorName={userName}
+          doctorId={userId}
+          onLogout={handleLogout}
+        />
+      );
+    }
+    if (userRole === "pharmacist") {
+      return (
+        <PharmacyDashboard
+          pharmacistName={userName}
+          pharmId={userId}
+          onLogout={handleLogout}
+        />
+      );
+    }
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <Header />
+      <div className="withHeader">
+        {authView === "login" ? (
+          <LoginBox
+            onSwitchToSignup={() => setAuthView("signup")}
+            onPatientLogin={(user) => {
+              setUserName(user.Name || "User");
+              setUserRole("patient");
+              setUserId(user.patientID || null);
+              setAuthView("dashboard");
+            }}
+            onDoctorLogin={(user) => {
+              setUserName(user.Name || "User");
+              setUserRole("doctor");
+              setUserId(user.doctorID || null);
+              setAuthView("dashboard");
+            }}
+            onPharmaLogin={(user) => {
+              setUserName(user.Name || "User");
+              setUserRole("pharmacist");
+              setUserId(user.pharmID || null);
+              setAuthView("dashboard");
+            }}
+          />
+        ) : (
+          <SignupBox onSwitchToLogin={() => setAuthView("login")} />
+        )}
       </div>
-      <h1>BROOOO armstrong is doing mathszz</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

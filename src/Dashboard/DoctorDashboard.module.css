@@ -1,0 +1,306 @@
+.page {
+  composes: page from '../styles/dashboard.shared.module.css';
+}
+
+.topBar {
+  composes: topBarBase from '../styles/dashboard.shared.module.css';
+  background-color: #2f8a3a;
+  box-shadow: 0 4px 10px rgba(30, 111, 217, 0.2);
+}
+
+.greeting {
+  composes: greeting from '../styles/dashboard.shared.module.css';
+}
+
+.userMeta {
+  composes: userMeta from '../styles/dashboard.shared.module.css';
+}
+
+.userId {
+  composes: userId from '../styles/dashboard.shared.module.css';
+}
+
+.logoutButton {
+  composes: logoutButtonBase from '../styles/dashboard.shared.module.css';
+  color: #2f8a3a;
+}
+
+.main {
+  composes: main from '../styles/dashboard.shared.module.css';
+}
+
+.searchBar {
+  composes: searchBarBase from '../styles/dashboard.shared.module.css';
+}
+
+.searchInput {
+  composes: field from '../styles/field.shared.module.css';
+  flex: 1;
+}
+
+.searchSelect {
+  composes: field from '../styles/field.shared.module.css';
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.card {
+  composes: card from '../styles/card.shared.module.css';
+}
+
+.cardHeader {
+  composes: cardHeader from '../styles/card.shared.module.css';
+}
+
+.cardTitle {
+  composes: cardTitle from '../styles/card.shared.module.css';
+}
+
+.patientList {
+  composes: list from '../styles/list.shared.module.css';
+}
+
+.patientItem {
+  composes: listItem from '../styles/list.shared.module.css';
+}
+
+.patientMain {
+  composes: stackSm from '../styles/list.shared.module.css';
+}
+
+.patientActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.listTitle {
+  composes: listTitle from '../styles/list.shared.module.css';
+}
+
+.listSub {
+  composes: listSub from '../styles/list.shared.module.css';
+}
+
+.secondaryButton {
+  background: #e6f4e8;
+  color: #2f8a3a;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primaryButton {
+  background: #2f8a3a;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.secondaryActionButton {
+  background: #ffffff;
+  color: #2f8a3a;
+  border: 1px solid rgba(47, 138, 58, 0.35);
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 30, 22, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(18, 38, 63, 0.25);
+  width: min(640px, 100%);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-border-soft);
+}
+
+.modalTitle {
+  margin: 0;
+  font-size: 18px;
+}
+
+.modalClose {
+  background: #e6f4e8;
+  color: #2f8a3a;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.modalActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modalBody {
+  padding: 16px 20px 20px;
+  overflow: auto;
+  font-size: 14px;
+  color: #3b4657;
+}
+
+.profileRow {
+  margin-bottom: 10px;
+  word-break: break-word;
+}
+
+.profileLabel {
+  font-weight: 600;
+  color: #2f3b4a;
+}
+
+.profileValue {
+  color: var(--color-text-secondary);
+}
+
+.createSection {
+  background: #f7fbf8;
+  border: 1px solid #e1eee4;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.formRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #2f3b4a;
+}
+
+.formInput {
+  composes: field from '../styles/field.shared.module.css';
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.toggleButton {
+  border: 1px solid rgba(47, 138, 58, 0.35);
+  background: #ffffff;
+  color: #2f8a3a;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.toggleButtonActive {
+  background: #2f8a3a;
+  color: #ffffff;
+  border-color: transparent;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.formError {
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.historyEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.historyTextarea {
+  width: 100%;
+  min-height: 160px;
+  composes: field from '../styles/field.shared.module.css';
+  resize: vertical;
+}
+
+.historyActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.historyError {
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+.profileHistory {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.profileHistoryItem {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f2f6f1;
+  color: #3b4657;
+}
+
+@media (max-width: 720px) {
+  .topBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .searchBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .patientItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

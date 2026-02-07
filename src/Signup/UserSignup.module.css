@@ -1,0 +1,50 @@
+.signupForm {
+}
+
+.input {
+  composes: field from '../styles/auth.form.shared.module.css';
+  composes: fieldSpacing from '../styles/auth.form.shared.module.css';
+}
+
+.textarea {
+  composes: field from '../styles/auth.form.shared.module.css';
+  composes: fieldSpacing from '../styles/auth.form.shared.module.css';
+}
+
+.helperText {
+  margin: -8px 0 12px;
+  font-size: 12px;
+  color: var(--color-text-subtle);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.input.invalid {
+  composes: invalidField from '../styles/auth.form.shared.module.css';
+}
+
+.errorText {
+  composes: errorText from '../styles/auth.form.shared.module.css';
+}
+
+.successText {
+  color: #2f8a3a;
+  font-size: 12px;
+  margin-top: -10px;
+}
+
+.submitButton {
+  composes: submitButton from '../styles/auth.form.shared.module.css';
+}
+
+.passwordContainer {
+  composes: passwordContainer from '../styles/auth.form.shared.module.css';
+  composes: fieldSpacing from '../styles/auth.form.shared.module.css';
+}
+
+.togglePasswordButton {
+  composes: togglePasswordButton from '../styles/auth.form.shared.module.css';
+}

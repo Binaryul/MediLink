@@ -1,0 +1,103 @@
+.card {
+  composes: card from '../styles/card.shared.module.css';
+}
+
+.cardHeader {
+  composes: cardHeader from '../styles/card.shared.module.css';
+}
+
+.cardTitle {
+  composes: cardTitle from '../styles/card.shared.module.css';
+}
+
+.chatPanel {
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-soft);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--color-surface-alt);
+}
+
+.chatMessages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.chatBubble {
+  max-width: 70%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+
+.chatBubbleLeft {
+  align-self: flex-start;
+  background: #f0f2f6;
+  color: var(--color-text-primary);
+}
+
+.chatBubbleRight {
+  align-self: flex-end;
+  background: #4b4ae2;
+  color: #ffffff;
+}
+
+.chatSender {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.chatBody {
+  line-height: 1.4;
+}
+
+.chatTime {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.chatInputRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.chatInput {
+  flex: 1;
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-input);
+  padding: 10px 12px;
+  font-size: 14px;
+  background: var(--color-surface);
+}
+
+.primaryButton {
+  background: #1e6fd9;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.primaryButton:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+@media (max-width: 720px) {
+  .chatBubble {
+    max-width: 100%;
+  }
+}

@@ -1,0 +1,126 @@
+.page {
+  composes: page from '../styles/dashboard.shared.module.css';
+}
+
+.topBar {
+  composes: topBarBase from '../styles/dashboard.shared.module.css';
+  background-color: #8a2be2;
+  box-shadow: 0 4px 10px rgba(138, 43, 226, 0.2);
+}
+
+.greeting {
+  composes: greeting from '../styles/dashboard.shared.module.css';
+}
+
+.userMeta {
+  composes: userMeta from '../styles/dashboard.shared.module.css';
+}
+
+.userId {
+  composes: userId from '../styles/dashboard.shared.module.css';
+}
+
+.logoutButton {
+  composes: logoutButtonBase from '../styles/dashboard.shared.module.css';
+  color: #8a2be2;
+}
+
+.main {
+  composes: main from '../styles/dashboard.shared.module.css';
+}
+
+.collectBar {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  background: var(--color-surface);
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+}
+
+.collectInputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.collectLabel {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.collectInput {
+  composes: field from '../styles/field.shared.module.css';
+  padding: 10px 12px;
+  font-size: 16px;
+  letter-spacing: 0.2em;
+}
+
+.collectButton {
+  background: #8a2be2;
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.collectButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+.collectButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.collectMessage {
+  padding: 10px 14px;
+  border-radius: var(--radius-input);
+  background: #f7f3ff;
+  color: #4a246c;
+  font-size: 14px;
+}
+
+.searchBar {
+  composes: searchBarBase from '../styles/dashboard.shared.module.css';
+}
+
+.searchInput {
+  composes: field from '../styles/field.shared.module.css';
+  flex: 1;
+}
+
+.searchSelect {
+  composes: field from '../styles/field.shared.module.css';
+}
+
+@media (max-width: 720px) {
+  .topBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .main {
+    padding: 20px;
+  }
+
+  .collectBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .searchBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -130,7 +130,8 @@ def register(role):
     }), status
 
 
-@app.route('/api/logout', methods=['POST'])
+@app.route('/api/logout', methods=['GET', 'POST'])
+@require_login()
 def logout():
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     session.clear()
@@ -178,6 +179,49 @@ def get_profile(TargetRole, userID):
     return safe_user
 
 
+# --- Patient Doctor Route ---
+@app.route('/api/patient/doctor', methods=['GET'])
+@require_login(roles=["patient"])
+def get_assigned_doctor():
+    db = get_db()
+    row = db.execute(
+        "SELECT doctorID FROM DPEnrole WHERE patientID = ? LIMIT 1",
+        (session["UserID"],),
+    ).fetchone()
+    if row is None:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Doctor not found"}), 404
+
+    safe_user = user_info(row["doctorID"], "doctor")
+    if safe_user is None:
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Doctor not found"}), 404
+
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
+    return jsonify({"status": "success", "doctor": safe_user})
+
+
+# --- Doctor Patient List Route ---
+@app.route('/api/doctor/patients', methods=['GET'])
+@require_login(roles=["doctor"])
+def get_assigned_patients():
+    db = get_db()
+    rows = db.execute(
+        """
+        SELECT Patients.patientID, Patients.Name
+        FROM DPEnrole
+        JOIN Patients ON Patients.patientID = DPEnrole.patientID
+        WHERE DPEnrole.doctorID = ?
+        ORDER BY Patients.Name
+        """,
+        (session["UserID"],),
+    ).fetchall()
+
+    patients = [dict(row) for row in rows]
+    append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
+    return jsonify({"status": "success", "patients": patients})
+
+
 # --- Patient History Update Route ---
 @app.route('/api/profile/patient/<patientID>', methods=['PUT'])
 @require_login(roles=["doctor"]) # Only doctors can update patient history
@@ -191,7 +235,7 @@ def update_patient_history(patientID):
     try:
         updated = update_by_id(
             table = "Patients",
-            user_id = patientID,
+            userID = patientID,
             updates = {"PatientHistory": json.dumps(data["PatientHistory"])}
         )
     except ValueError as ve:
@@ -251,22 +295,45 @@ def send_message(patientID):
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
     return jsonify({"status": "success"})
 
+# --- Prescription Routes ---
 
-@app.route('/api/prescriptions/<prescriptionID>', methods=['GET'])
+@app.route('/api/prescriptions', methods=['GET'])
 @require_login()
-def get_prescription(prescriptionID):
-    try:
-        prescription = fetch_prescription_details(session["UserID"], session["Role"], prescriptionID)
-    except ValueError as exc:
+def get_prescriptions():
+    role = session["Role"]
+    role_column_map = {
+        "patient": "patientID",
+        "doctor": "doctorID",
+        "pharmacist": "pharmID",
+    }
+    role_column = role_column_map.get(role)
+    if role_column is None:
         append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
-        return jsonify({"error": str(exc)}), 400
+        return jsonify({"error": "Invalid role"}), 400
 
-    if prescription is None:
-        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
-        return jsonify({"error": "Prescription not found"}), 404
+    db = get_db()
+    rows = db.execute(
+        f"""
+        SELECT prescriptionID
+        FROM Prescriptions
+        WHERE {role_column} = ?
+        ORDER BY prescriptionID
+        """,
+        (session["UserID"],),
+    ).fetchall()
+
+    prescriptions = []
+    for row in rows:
+        prescription = fetch_prescription_details(
+            session["UserID"],
+            role, # The helper has logic to determine what details to show based on role so we can just pass it in
+            row["prescriptionID"],
+        )
+        if prescription is not None:
+            prescriptions.append(prescription)
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success", "prescription": prescription})
+    return jsonify({"status": "success", "prescriptions": prescriptions})
 
 
 @app.route('/api/prescriptions', methods=['POST'])
@@ -274,6 +341,7 @@ def get_prescription(prescriptionID):
 def create_prescription_route():
     data = request.get_json() or {}
     try:
+        data["doctorID"] = session["UserID"]
         create_prescription(data)
     except Exception:
         append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
@@ -297,12 +365,18 @@ def delete_prescription_route(prescriptionID):
         session["UserID"],
         collection_code,
     )
-    if not deleted:
+    if deleted == "invalid_code":
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Invalid collection code"}), 400
+    if deleted == "not_found":
+        append_audit_log(session.get("Role"), session.get("UserID"), request.path, False)
+        return jsonify({"error": "Prescription not found"}), 404
+    if deleted == "code_changed":
         append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-        return jsonify({"status": "success code changed"})
+        return jsonify({"status": "Prescription Collected and Code Changed"})
 
     append_audit_log(session.get("Role"), session.get("UserID"), request.path, True)
-    return jsonify({"status": "success prescription deleted"})
+    return jsonify({"status": "Prescription Collected and Deleted"})
 
 
 if __name__ == '__main__':

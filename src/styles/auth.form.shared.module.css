@@ -1,0 +1,64 @@
+.field {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid var(--color-border-default);
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.fieldSpacing {
+  margin-bottom: 15px;
+}
+
+.invalidField {
+  border-color: var(--color-danger-strong);
+  background-color: var(--color-danger-bg);
+}
+
+.errorText {
+  color: var(--color-danger-strong);
+  font-size: 12px;
+  margin-top: -10px;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  font-size: 16px;
+  background-color: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: var(--accent_dark);
+}
+
+.submitButton:disabled {
+  background-color: var(--color-border-default);
+  cursor: not-allowed;
+}
+
+.passwordContainer {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.togglePasswordButton {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-90%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #888;
+}

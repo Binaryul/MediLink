@@ -1,0 +1,90 @@
+.card {
+  composes: card from '../styles/card.shared.module.css';
+}
+
+.cardHeader {
+  composes: cardHeader from '../styles/card.shared.module.css';
+}
+
+.cardTitle {
+  composes: cardTitle from '../styles/card.shared.module.css';
+}
+
+.prescriptionList {
+  composes: list from '../styles/list.shared.module.css';
+}
+
+.prescriptionItem {
+  composes: listItem from '../styles/list.shared.module.css';
+}
+
+.prescriptionSelectable {
+  cursor: pointer;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.prescriptionSelectable:hover {
+  border-color: #b9c7db;
+  box-shadow: 0 6px 18px rgba(18, 38, 63, 0.08);
+}
+
+.prescriptionSelected {
+  border-color: #8a2be2;
+  box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+}
+
+.prescriptionMain {
+  composes: stackSm from '../styles/list.shared.module.css';
+}
+
+.prescriptionMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.listTitle {
+  composes: listTitle from '../styles/list.shared.module.css';
+}
+
+.listSub {
+  composes: listSub from '../styles/list.shared.module.css';
+  margin-bottom: 6px;
+}
+
+.listMeta {
+  font-size: 12px;
+  color: var(--color-text-soft);
+}
+
+.statusPill {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.statusActive {
+  background: #def7e7;
+  color: #1f7a3b;
+}
+
+.statusExpired {
+  background: #f2f4f7;
+  color: var(--color-text-muted);
+}
+
+.refills {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 720px) {
+  .prescriptionItem {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

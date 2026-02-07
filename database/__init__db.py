@@ -61,10 +61,15 @@ c.execute("""
 
 c.execute(""" 
 	CREATE TABLE IF NOT EXISTS Prescriptions(
-          patientID TEXT NOT NULL PRIMARY KEY,
-          prescriptionID TEXT UNIQUE NOT NULL,
+          patientID TEXT NOT NULL,
+          prescriptionID TEXT NOT NULL PRIMARY KEY,
           doctorID TEXT NOT NULL,
           pharmID TEXT NOT NULL,
+          MedicineName TEXT NOT NULL,
+          Instructions TEXT,
+          DatePrescribed DATE NOT NULL,
+          DurationType TEXT NOT NULL,
+          CollectionCode TEXT NOT NULL,
           FOREIGN KEY (patientID)
           	REFERENCES Patients (patientID),
           FOREIGN KEY (doctorID)
@@ -74,45 +79,9 @@ c.execute("""
     );
 """)
 
-c.execute(""" 
-	CREATE TABLE IF NOT EXISTS Medicines(
-          prescriptionID TEXT NOT NULL PRIMARY KEY,
-          MedicineName TEXT NOT NULL,
-          Instructions TEXT,
-          DatePrescribed DATE NOT NULL,
-          DurationType TEXT NOT NULL,
-          CollectionCode TEXT NOT NULL,
-          FOREIGN KEY (prescriptionID)
-			REFERENCES Prescriptions (prescriptionID)
-    );
-""")
 
 #---------------------------------------------------------
 
-#--------------------------------------------------------- Notices
-
-c.execute("""
-	CREATE TABLE IF NOT EXISTS Notices(
-          patientID TEXT NOT NULL PRIMARY KEY,
-          noticeID TEXT UNIQUE NOT NULL,
-          doctorID TEXT NOT NULL,
-          FOREIGN KEY (patientID)
-			REFERENCES Patients (patientID),
-          FOREIGN KEY (doctorID)
-			REFERENCES Doctors (doctorID)
-    );
-""")
-
-
-c.execute("""
-	CREATE TABLE IF NOT EXISTS NoticeContent(
-          noticeID TEXT NOT NULL PRIMARY KEY,
-          Date DATE NOT NULL,
-          Message TEXT NOT NULL,
-          FOREIGN KEY (noticeID)
-			REFERENCES Notices (noticeID)
-    );
-""")
 
 conn.commit()
 conn.close()
