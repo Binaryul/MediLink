@@ -20,6 +20,17 @@
   font-weight: 600;
 }
 
+.userMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.userId {
+  font-size: 12px;
+  opacity: 0.85;
+}
+
 .logoutButton {
   background: #ffffff;
   color: #1e6fd9;

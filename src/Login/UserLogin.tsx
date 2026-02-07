@@ -105,7 +105,6 @@ function UserLogin({ activeTab, userType, onLoginSuccess }: UserLoginProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({ Email: email, Password: password }),
       });
       const result = await response.json();

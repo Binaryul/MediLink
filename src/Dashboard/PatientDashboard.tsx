@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import MessagePanel, { type MessagePanelItem } from "../components/MessagePanel";
+import { MessagePanelContainer } from "../components/MessagePanel";
 import styles from "./PatientDashboard.module.css";
 
 interface Prescription {
@@ -29,58 +29,13 @@ function PatientDashboard({
   const [doctorError, setDoctorError] = useState("");
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
   const [prescriptionError, setPrescriptionError] = useState("");
-  const [messages, setMessages] = useState<MessagePanelItem[]>([]);
-  const [messagesError, setMessagesError] = useState("");
-
-  function formatTimestamp(date: Date) {
-    const pad = (value: number) => String(value).padStart(2, "0");
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
-      date.getDate(),
-    )} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-      date.getSeconds(),
-    )}`;
-  }
-
-  async function loadMessages() {
-    try {
-      const response = await fetch("/api/messages/me", {
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (response.ok) {
-        const mapped = (result.messages || []).map(
-          (message: {
-            sender?: string;
-            message?: string;
-            timestamp?: string;
-          }) => ({
-            id: `${message.sender || "unknown"}-${message.timestamp || ""}`,
-            sender:
-              patientId && message.sender === patientId ? "You" : "Doctor",
-            body: message.message || "",
-            time: message.timestamp || "",
-            side:
-              patientId && message.sender === patientId ? "right" : "left", // Align patient's messages to the right and doctor's to the left
-          }),
-        );
-        setMessages(mapped);
-        setMessagesError("");
-      } else {
-        setMessagesError(result.error || "Unable to load messages.");
-      }
-    } catch {
-      setMessagesError("Unable to load messages.");
-    }
-  }
 
   useEffect(() => {
     let isActive = true;
 
     async function fetchDoctor() {
       try {
-        const response = await fetch("/api/patient/doctor", {
-          credentials: "include",
-        });
+        const response = await fetch("/api/patient/doctor");
         const result = await response.json();
         if (!isActive) {
           return;
@@ -108,53 +63,9 @@ function PatientDashboard({
   useEffect(() => {
     let isActive = true;
 
-    async function fetchMessages() {
-      try {
-        await loadMessages();
-        if (!isActive) {
-          return;
-        }
-      } catch {
-        if (!isActive) {
-          return;
-        }
-        setMessagesError("Unable to load messages.");
-      }
-    }
-
-    fetchMessages();
-
-    return () => {
-      isActive = false;
-    };
-  }, [patientId]);
-
-  async function handleSendMessage(message: string) {
-    const timestamp = formatTimestamp(new Date());
-    const response = await fetch("/api/messages/me", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ message, timestamp }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      setMessagesError(result.error || "Unable to send message.");
-      return;
-    }
-    await loadMessages();
-  }
-
-  useEffect(() => {
-    let isActive = true;
-
     async function fetchPrescriptions() {
       try {
-        const response = await fetch("/api/prescriptions", {
-          credentials: "include",
-        });
+        const response = await fetch("/api/prescriptions");
         const result = await response.json();
         if (!isActive) {
           return;
@@ -184,7 +95,12 @@ function PatientDashboard({
   return (
     <div className={styles.page}>
       <header className={styles.topBar}>
-        <div className={styles.greeting}>Hello {patientName}</div>
+        <div className={styles.userMeta}>
+          <div className={styles.greeting}>Hello {patientName}</div>
+          <div className={styles.userId}>
+            ID: {patientId || "Unavailable"}
+          </div>
+        </div>
         <button className={styles.logoutButton} type="button" onClick={onLogout}>
           Log out
         </button>
@@ -242,11 +158,12 @@ function PatientDashboard({
           </ul>
         </section>
 
-        <MessagePanel
+        <MessagePanelContainer
           title="Messages with Doctor"
-          messages={messages}
-          inputPlaceholder={messagesError || "Type your message..."}
-          onSend={handleSendMessage}
+          fetchUrl={`/api/messages/${patientId || "me"}`}
+          postUrl={`/api/messages/${patientId || "me"}`}
+          currentUserId={patientId}
+          otherLabel="Doctor"
         />
 
         <section className={styles.card}>

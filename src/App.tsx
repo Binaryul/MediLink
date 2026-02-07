@@ -20,7 +20,7 @@ function App() {
 
     async function checkSession() {
       try {
-        const response = await fetch("/api/me", { credentials: "include" });
+        const response = await fetch("/api/me");
         const result = await response.json();
         if (!isActive) {
           return; // If the component has unmounted, do not update state
@@ -57,7 +57,7 @@ function App() {
 
   async function handleLogout() {
     try {
-      await fetch("/api/logout", { method: "POST", credentials: "include" });
+      await fetch("/api/logout", { method: "POST" });
     } finally {
       setAuthView("login");
       setUserName("User");
@@ -82,7 +82,11 @@ function App() {
     }
     if (userRole === "doctor") {
       return (
-        <DoctorDashboard doctorName={userName} onLogout={handleLogout} />
+        <DoctorDashboard
+          doctorName={userName}
+          doctorId={userId}
+          onLogout={handleLogout}
+        />
       );
     }
   }

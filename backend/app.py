@@ -235,7 +235,7 @@ def update_patient_history(patientID):
     try:
         updated = update_by_id(
             table = "Patients",
-            user_id = patientID,
+            userID = patientID,
             updates = {"PatientHistory": json.dumps(data["PatientHistory"])}
         )
     except ValueError as ve:

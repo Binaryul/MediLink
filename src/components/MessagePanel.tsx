@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./MessagePanel.module.css";
 
 export interface MessagePanelItem {
@@ -14,6 +14,124 @@ interface MessagePanelProps {
   messages: MessagePanelItem[];
   inputPlaceholder?: string;
   onSend?: (message: string) => Promise<void> | void;
+}
+
+interface MessagePanelContainerProps {
+  title: string;
+  fetchUrl: string;
+  postUrl: string;
+  currentUserId?: string | null;
+  otherLabel: string;
+  inputPlaceholder?: string;
+}
+
+function formatTimestamp(date: Date) {
+  const pad = (value: number) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(
+    date.getDate(),
+  )} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
+    date.getSeconds(),
+  )}`;
+}
+
+function mapMessages(
+  messages: Array<{ sender?: string; message?: string; timestamp?: string }>,
+  currentUserId: string | null | undefined,
+  otherLabel: string,
+): MessagePanelItem[] {
+  return messages.map((message) => ({
+    id: `${message.sender || "unknown"}-${message.timestamp || ""}`,
+    sender: currentUserId && message.sender === currentUserId ? "You" : otherLabel,
+    body: message.message || "",
+    time: message.timestamp || "",
+    side: currentUserId && message.sender === currentUserId ? "right" : "left",
+  }));
+}
+
+export function MessagePanelContainer({
+  title,
+  fetchUrl,
+  postUrl,
+  currentUserId,
+  otherLabel,
+  inputPlaceholder = "Type your message...",
+}: MessagePanelContainerProps) {
+  const [messages, setMessages] = useState<MessagePanelItem[]>([]);
+  const [messagesError, setMessagesError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function loadMessages() {
+    try {
+      setIsLoading(true);
+      const response = await fetch(fetchUrl, { credentials: "include" });
+      const result = await response.json();
+      if (response.ok) {
+        const mapped = mapMessages(result.messages || [], currentUserId, otherLabel);
+        setMessages(mapped);
+        setMessagesError("");
+      } else {
+        setMessagesError(result.error || "Unable to load messages.");
+      }
+    } catch {
+      setMessagesError("Unable to load messages.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    let isActive = true;
+
+    async function fetchMessages() {
+      try {
+        await loadMessages();
+        if (!isActive) {
+          return;
+        }
+      } catch {
+        if (!isActive) {
+          return;
+        }
+        setMessagesError("Unable to load messages.");
+      }
+    }
+
+    fetchMessages();
+
+    return () => {
+      isActive = false;
+    };
+  }, [fetchUrl, currentUserId, otherLabel]);
+
+  async function handleSendMessage(message: string) {
+    const timestamp = formatTimestamp(new Date());
+    const response = await fetch(postUrl, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ message, timestamp }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      setMessagesError(result.error || "Unable to send message.");
+      return;
+    }
+    await loadMessages();
+  }
+
+  return (
+    <>
+      {isLoading && <div>Loading messages...</div>}
+      <MessagePanel
+        title={title}
+        messages={messages}
+        inputPlaceholder={messagesError || inputPlaceholder}
+        onSend={handleSendMessage}
+      />
+    </>
+  );
 }
 
 function MessagePanel({
