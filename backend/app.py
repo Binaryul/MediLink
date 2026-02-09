@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request, session
 from flask_cors import CORS
 from functools import wraps
 import json
+import time
 from helpers.db import (
     get_db,
     close_db,
@@ -31,6 +32,18 @@ def require_login(roles=None):
         def wrapper(*args, **kwargs):
             if "UserID" not in session:
                 return jsonify({"error": "Not logged in"}), 401
+            login_at = session.get("login_at")
+            if not login_at:
+                session.clear()
+                return jsonify({"error": "Session expired"}), 401
+            try:
+                login_at_value = float(login_at)
+            except (TypeError, ValueError):
+                session.clear()
+                return jsonify({"error": "Session expired"}), 401
+            if time.time() - login_at_value > 7200:  # 2 hours session timeout
+                session.clear()
+                return jsonify({"error": "Session expired"}), 401
             if roles is not None:
                 if session["Role"] not in roles:
                     return jsonify({"error": "Unauthorized"}), 403
@@ -55,7 +68,7 @@ def login(role):
     
     safe_user = {k:v for k, v in user.items() if k != "PasswordHash"}
 
-    session.permanent = True
+    session.permanent = False
     role_id_map = {
         "patient": "patientID",
         "doctor": "doctorID",
@@ -64,6 +77,7 @@ def login(role):
     session["UserID"] = safe_user[role_id_map[role]]
     session["Email"] = safe_user["Email"]
     session["Role"] = role
+    session["login_at"] = int(time.time())
 
     append_audit_log(role, session.get("UserID"), request.path, True)
     return jsonify({

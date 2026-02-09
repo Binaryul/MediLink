@@ -28,7 +28,7 @@
   box-shadow: 0 6px 18px rgba(18, 38, 63, 0.08);
 }
 
-.prescriptionSelected {
+.prescriptionItem.prescriptionSelected {
   border-color: #8a2be2;
   box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
 }

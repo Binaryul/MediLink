@@ -80,6 +80,13 @@ function UserSignup({ activeTab, userType }: UserSignupProps) {
     return userType === "Patient";
   }
 
+  function isStrongPassword(value: string) {
+    const hasMinLength = value.length >= 8;
+    const hasNumber = /\d/.test(value);
+    const hasSpecial = /[^A-Za-z0-9]/.test(value);
+    return hasMinLength && hasNumber && hasSpecial;
+  }
+
   async function handleSubmit() {
     if (!name || !email || !password) {
       setStatusMessage("Please fill in all required fields.");
@@ -95,6 +102,14 @@ function UserSignup({ activeTab, userType }: UserSignupProps) {
 
     if (requiresDoctorFields() && (!doctorId || !dob)) {
       setStatusMessage("Please enter doctor ID and date of birth.");
+      setIsError(true);
+      return;
+    }
+
+    if (!isStrongPassword(password)) {
+      setStatusMessage(
+        "Password must be longer than 8 characters and have a number and a special character.",
+      );
       setIsError(true);
       return;
     }

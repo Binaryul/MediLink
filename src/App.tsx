@@ -36,6 +36,11 @@ function App() {
               null,
           );
           setAuthView("dashboard");
+        } else {
+          setAuthView("login");
+          setUserName("User");
+          setUserRole(null);
+          setUserId(null);
         }
       } catch {
         if (!isActive) {
